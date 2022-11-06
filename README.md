@@ -4,6 +4,7 @@ Dapper.Contrib - fast BulkInsert, BulkUpdate, BulkInsertOrUpdate, BulkCopy and B
 Depends on
 
 [Dapper](https://www.nuget.org/packages/Dapper)
+
 [FastMember](https://www.nuget.org/packages/FastMember)
 
 Build status
