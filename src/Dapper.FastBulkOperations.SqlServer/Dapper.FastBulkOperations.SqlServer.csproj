@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <LangVersion>10</LangVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>Extra Fast Insert / Update / InserOrUpdate / Delete operations for Dapper</Description>
+    <RepositoryUrl>https://github.com/filipppka/F.Dapper.FastBulkOperations</RepositoryUrl>
+    <PackageTags>dapper, bulkcopy,insertorupdate,bulkdelete,bulkmerge,bulkinsert, dapper insert, dapper update, dapper delete, dapper merge</PackageTags>
+    <PackageVersion>0.0.1</PackageVersion>
+    <Title>Dapper.FastBulkOperations.SqlSver</Title>
+    <PackageProjectUrl>https://github.com/filipppka/F.Dapper.FastBulkOperations</PackageProjectUrl>
+    <PackageLicenseUrl>https://licenses.nuget.org/Apache-2.0</PackageLicenseUrl>
+    <license>https://licenses.nuget.org/Apache-2.0</license>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <TargetFramework>net6.0</TargetFramework>
+    <Authors>Filipp Kleymenov</Authors>
+    <PackageId>Dapper.FastBulkOperations.SqlServer</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="FastMember" Version="1.5.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.0.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper.FastBulkOperations.SqlServer", "src\Dapper.FastBulkOperations.SqlServer\Dapper.FastBulkOperations.SqlServer.csproj", "{CA2F7B83-0F93-4B88-9F64-F4D973DB61C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F488549D-8767-4910-940F-FC8C450F1074}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6A9EE9CF-8C13-4C47-8C3C-04331B49AA16}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "benchmark", "benchmark", "{DD0278A6-50C7-469F-8560-BFAA6C702516}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper.FastBulkOperations.SqlServer.Benchmarks", "benchmark\Dapper.FastBulkOperations.SqlServer.Benchmarks\Dapper.FastBulkOperations.SqlServer.Benchmarks.csproj", "{82DC080E-E476-492B-AB31-E81E4E151EAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dapper.FastBulkOperations.SqlServer.Tests", "tests\Dapper.FastBulkOperations.SqlServer.Tests\Dapper.FastBulkOperations.SqlServer.Tests.csproj", "{42261F6A-E164-4B39-8EF1-2BBFB06CB5CB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA2F7B83-0F93-4B88-9F64-F4D973DB61C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82DC080E-E476-492B-AB31-E81E4E151EAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82DC080E-E476-492B-AB31-E81E4E151EAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82DC080E-E476-492B-AB31-E81E4E151EAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82DC080E-E476-492B-AB31-E81E4E151EAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42261F6A-E164-4B39-8EF1-2BBFB06CB5CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42261F6A-E164-4B39-8EF1-2BBFB06CB5CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42261F6A-E164-4B39-8EF1-2BBFB06CB5CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42261F6A-E164-4B39-8EF1-2BBFB06CB5CB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CA2F7B83-0F93-4B88-9F64-F4D973DB61C4} = {F488549D-8767-4910-940F-FC8C450F1074}
+		{DD0278A6-50C7-469F-8560-BFAA6C702516} = {6A9EE9CF-8C13-4C47-8C3C-04331B49AA16}
+		{82DC080E-E476-492B-AB31-E81E4E151EAD} = {DD0278A6-50C7-469F-8560-BFAA6C702516}
+		{42261F6A-E164-4B39-8EF1-2BBFB06CB5CB} = {6A9EE9CF-8C13-4C47-8C3C-04331B49AA16}
+	EndGlobalSection
+EndGlobal
