@@ -24,7 +24,7 @@ public static partial class BulkExtensions
         var cacheItem = GetTypeCacheItem<T>();
         tableName ??= cacheItem.TableName;
 
-        await using var bulkCopy = new BulkWriter<T>(items, connection, transaction, batchSize ?? items.Count, int.MaxValue, tableName, excludeColumns is null ? cacheItem.ColumnsToProperty : cacheItem.ColumnsToProperty.ExceptBy(excludeColumns, x => x.Key), cacheItem.PropertyNames);
+        await using var bulkCopy = new BulkWriter<T>(items, connection, transaction, batchSize ?? items.Count, int.MaxValue, tableName, excludeColumns is null ? cacheItem.ColumnsToProperty : cacheItem.ColumnsToProperty.Where(x => !excludeColumns.Contains(x.Key)), cacheItem.PropertyNames);
         await bulkCopy.WriteAsync();
         
         if (shouldCloseConnection) connection.Close();
@@ -154,7 +154,7 @@ public static partial class BulkExtensions
          
          tableName ??= cacheItem.TableName;
          primaryKeys ??= cacheItem.PrimaryKeys ?? await FindPrimaryKeysInfoAsync(connection, transaction, tableName);
-         var result = await WriteToTempAsync(connection, items, cacheItem.ColumnsToProperty.IntersectBy(primaryKeys, x => x.Key).ToDictionary(x => x.Key, x=> x.Value), cacheItem.PropertyNames, tableName, transaction, batchSize, bulkCopyTimeout,
+         var result = await WriteToTempAsync(connection, items,  cacheItem.ColumnsToProperty.Where(x => primaryKeys.Contains(x.Key)).ToDictionary(x => x.Key, x=> x.Value), cacheItem.PropertyNames, tableName, transaction, batchSize, bulkCopyTimeout,
              primaryKeys, timeout);
          
          await connection.ExecuteAsync(GetDeleteMergeQuery(result), transaction: transaction, commandTimeout: timeout);

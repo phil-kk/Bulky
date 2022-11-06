@@ -26,7 +26,7 @@ public static partial class BulkExtensions
         var shouldCloseConnection =  OpenConnectionIfNot(connection);
         var cacheItem = GetTypeCacheItem<T>();
         tableName ??= cacheItem.TableName;
-        using var bulkCopy = new BulkWriter<T>(items, connection, transaction, batchSize ?? items.Count, int.MaxValue, tableName, excludeColumns is null ? cacheItem.ColumnsToProperty : cacheItem.ColumnsToProperty.ExceptBy(excludeColumns, x => x.Key), cacheItem.PropertyNames);
+        using var bulkCopy = new BulkWriter<T>(items, connection, transaction, batchSize ?? items.Count, int.MaxValue, tableName, excludeColumns is null ? cacheItem.ColumnsToProperty : cacheItem.ColumnsToProperty.Where(x => excludeColumns.Contains(x.Key)), cacheItem.PropertyNames);
         bulkCopy.Write();
         
         if (shouldCloseConnection) connection.Close();
