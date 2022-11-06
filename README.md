@@ -1,3 +1,8 @@
+Build status
+
+[![Build status](https://ci.appveyor.com/api/projects/status/iylj7wjrak5866i6?svg=true)](https://ci.appveyor.com/project/filipppka/dapper-fastbulkoperations)
+
+
 Short Run Merge 100 000 New Items
 
 |             Method |        Job |                Toolchain | LaunchCount | RunStrategy | UnrollFactor | WarmupCount |    Mean | Error |  StdErr |  StdDev |     Min |      Q1 |  Median |      Q3 |     Max |   Op/s |       Gen0 |      Gen1 |      Gen2 | Allocated |
