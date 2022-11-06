@@ -8,6 +8,8 @@ Build status
 
 Depends on [Dapper](https://www.nuget.org/packages/Dapper) [FastMember](https://www.nuget.org/packages/FastMember)
 
+Please check samples folder
+
 API :
 
 ```csharp
