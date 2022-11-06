@@ -3,12 +3,12 @@
   <PropertyGroup>
     <LangVersion>10</LangVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Description>Extra Fast Insert / Update / InserOrUpdate / Delete operations for Dapper</Description>
+    <Description>Extra Fast BULK Insert / Update / InserOrUpdate / Delete operations for Dapper</Description>
     <RepositoryUrl>https://github.com/filipppka/F.Dapper.FastBulkOperations</RepositoryUrl>
-    <PackageTags>dapper, bulkcopy,insertorupdate,bulkdelete,bulkmerge,bulkinsert, dapper insert, dapper update, dapper delete, dapper merge</PackageTags>
+    <PackageTags>dapper, dapper bulk, bulkcopy,insertorupdate,bulkdelete,bulkmerge,bulkinsert, dapper insert, dapper update, dapper delete, dapper merge</PackageTags>
     <PackageVersion>0.0.1</PackageVersion>
     <Title>Dapper.FastBulkOperations.SqlSver</Title>
-    <PackageProjectUrl>https://github.com/filipppka/F.Dapper.FastBulkOperations</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/filipppka/Dapper.FastBulkOperations</PackageProjectUrl>
     <PackageLicenseUrl>https://licenses.nuget.org/Apache-2.0</PackageLicenseUrl>
     <license>https://licenses.nuget.org/Apache-2.0</license>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
