@@ -6,8 +6,9 @@ Dapper.Contrib - fast BulkInsert, BulkUpdate, BulkInsertOrUpdate, BulkCopy and B
 
 Depends on [Dapper](https://www.nuget.org/packages/Dapper) [FastMember](https://www.nuget.org/packages/FastMember)
 
-Simple usage 
+Simple usage :
 
+```csharp
 using Dapper;
 using Dapper.FastBulkOperations.SqlServer;
 using Microsoft.Data.SqlClient; // or System.Data.SqlClient
@@ -36,7 +37,7 @@ public class Person
     
     public string FullName { get; set; }
 }
-
+```
 Please check samples folder
 
 API :
