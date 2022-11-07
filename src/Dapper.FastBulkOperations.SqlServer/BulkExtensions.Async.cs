@@ -82,7 +82,7 @@ public static partial class BulkExtensions
              await bulkWriter.WriteAsync();
          }
 
-         return new WriteToTempTableResult(tableName, tempTable,  primaryKeys, identity);
+         return new WriteToTempTableResult { TableName = tableName, TempTable = tempTable, PrimaryKeys = primaryKeys, Identity = identity };
      }
      public static async Task BulkInsertAsync<T>(this IDbConnection connection,
          IList<T> items,

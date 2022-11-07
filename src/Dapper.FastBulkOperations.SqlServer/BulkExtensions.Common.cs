@@ -12,18 +12,26 @@ using FastMember;
 
 namespace Dapper.FastBulkOperations.SqlServer;
 
-public static partial class BulkExtensions
+public partial class BulkExtensions
 {
     private const int MemberSetCacheLimit = 10000;
 
-    internal record Identity(string ColumnName, string Type);
-
-    internal record struct CacheItem(
-        TypeAccessor TypeAccessor, string TableName, string Schema, Dictionary<string, Member> ColumnsToProperty, List<string> PrimaryKeys, string[] PropertyNames)
+    private class Identity
     {
-        internal IEnumerable<string> ColumnNames => ColumnsToProperty.Keys;
+        public string ColumnName { get; set; }
+        public string Type { get; set; }
+    }
 
-        internal volatile int HitPoints = 0;
+    private class CacheItem
+    {
+        public  TypeAccessor TypeAccessor { get; set; }
+        public  string TableName { get; set; }
+        public  string Schema { get; set; }
+        public  Dictionary<string, Member> ColumnsToProperty { get; set; }
+        public  List<string> PrimaryKeys { get; set; }
+        public  string[] PropertyNames { get; set; }
+        public IEnumerable<string> ColumnNames => ColumnsToProperty.Keys;
+        public volatile int HitPoints = 0;
     }
 
     private static volatile int _collected;
@@ -43,10 +51,9 @@ public static partial class BulkExtensions
         {
             foreach (var item in MemberSetCache)
             {
-                var temp = item.Value.HitPoints;
-                if (Interlocked.CompareExchange(ref temp, 0, 0) <= 0)
+                if (Interlocked.CompareExchange(ref item.Value.HitPoints, 0, 0) <= 0)
                 {
-                    MemberSetCache.TryRemove(item);
+                    MemberSetCache.TryRemove(item.Key, out _);
                 }
             }
         }
@@ -210,6 +217,7 @@ ON ({string.Join(" AND ", createTmpTableResult.PrimaryKeys.Select(x => $"S.[{x}]
 WHEN MATCHED
 THEN DELETE;
 DROP TABLE {createTmpTableResult.TempTable}";
+    
     private static string GetAlterIdentityColumnQuery(string tempTableName,
        Identity identity) =>
         $@"ALTER TABLE {tempTableName} ADD _IfIdentityJustOneColumn_{identity.ColumnName} BIT

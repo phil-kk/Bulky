@@ -10,11 +10,13 @@ namespace Dapper.FastBulkOperations.SqlServer;
 
 public static partial class BulkExtensions
 {
-    private record WriteToTempTableResult(
-        string TableName,
-        string TempTable,
-        IEnumerable<string> PrimaryKeys,
-        Identity Identity);
+    private struct WriteToTempTableResult
+    {
+        public string TableName { get; set; }
+        public string TempTable { get; set; }
+        public IEnumerable<string> PrimaryKeys { get; set; }
+        public  Identity Identity { get; set; }
+    }
     public static  void BulkCopy<T>(this IDbConnection connection,
         IList<T> items,
         string tableName = default,
@@ -80,8 +82,7 @@ public static partial class BulkExtensions
          {
              bulkWriter.Write();
          }
-
-         return new WriteToTempTableResult(tableName, tempTable,  primaryKeys, identity);
+         return new WriteToTempTableResult { TableName = tableName, TempTable = tempTable, PrimaryKeys = primaryKeys, Identity = identity };
      }
      public static void BulkInsert<T>(this IDbConnection connection,
          IList<T> items,
