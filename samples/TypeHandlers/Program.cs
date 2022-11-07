@@ -3,7 +3,7 @@ using System.Text.Json;
 using Dapper;
 using Dapper.FastBulkOperations.SqlServer;
 using Microsoft.Data.SqlClient; // or System.Data.SqlClient
-SqlMapper.AddTypeHandler(typeof(FullName),new JsonTypeHandler<FullName>());
+SqlMapper.AddTypeHandler(new JsonTypeHandler<FullName>());
 const string connectionString = "Server=localhost;Database=tempdb;Trusted_Connection=True;TrustServerCertificate=true;";
 
 await using var create = new SqlConnection(connectionString);
