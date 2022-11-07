@@ -16,14 +16,14 @@ public static partial class BulkExtensions
 {
     private const int MemberSetCacheLimit = 10000;
 
-    internal record Identity(string ColumnName, string Type);
+    private record Identity(string ColumnName, string Type);
 
-    internal record struct CacheItem(
+    private record struct CacheItem(
         TypeAccessor TypeAccessor, string TableName, string Schema, Dictionary<string, Member> ColumnsToProperty, List<string> PrimaryKeys, string[] PropertyNames)
     {
-        internal IEnumerable<string> ColumnNames => ColumnsToProperty.Keys;
+        public IEnumerable<string> ColumnNames => ColumnsToProperty.Keys;
 
-        internal volatile int HitPoints = 0;
+        public volatile int HitPoints = 0;
     }
 
     private static volatile int _collected;
@@ -168,20 +168,13 @@ THEN UPDATE SET {string.Join(',', columnNames.Except(writeToTempTableResult.Prim
         var insert = new StringBuilder();
         if (identityExist)
         {
-            insert.Append($"DECLARE @Id TABLE ([Id]");
-            insert.Append(createTmpTableResult.Identity.Type);
-            insert.Append(')');
+            insert.Append($"DECLARE @Id TABLE ([Id] {createTmpTableResult.Identity.Type})");
         }
 
-        insert.Append($@"
-INSERT INTO [{createTmpTableResult.TableName}]({columnsString})");
+        insert.Append($@"INSERT INTO [{createTmpTableResult.TableName}]({columnsString})");
         if (identityExist)
         {
-            insert.AppendLine();
-            insert.AppendLine($"OUTPUT inserted.");
-            insert.AppendLine(createTmpTableResult.Identity.ColumnName);
-            insert.AppendLine();
-            insert.AppendLine(" INTO @Id");
+            insert.AppendLine($"OUTPUT inserted.[{createTmpTableResult.Identity.ColumnName}] INTO @Id");
         }
         insert.AppendLine($"SELECT {columnsString} FROM {createTmpTableResult.TempTable}");
         if (identityExist)

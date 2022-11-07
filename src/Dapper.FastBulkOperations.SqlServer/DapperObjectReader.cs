@@ -18,7 +18,7 @@ public static class ObjectReaderExtensions
 
 public sealed class DapperObjectReader<T> : ObjectReader
 {
-    private static readonly Dictionary<Type, SqlMapper.ITypeHandler> TypeHandler = typeof(SqlMapper).GetField("typeHandlers", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Static)?.GetValue(null) as Dictionary<Type, SqlMapper.ITypeHandler>;
+    private static readonly Dictionary<Type, SqlMapper.ITypeHandler> _typeHandlers = typeof(SqlMapper).GetField("typeHandlers", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Static)?.GetValue(null) as Dictionary<Type, SqlMapper.ITypeHandler>;
 
     public DapperObjectReader(IEnumerable<T> source, params string[] members) : base(typeof(T), source, members)
     {
@@ -28,14 +28,12 @@ public sealed class DapperObjectReader<T> : ObjectReader
     {
         if (value is null || value == DBNull.Value) return null;
         var type = value.GetType();
-        if (!TypeHandler.ContainsKey(type)) return value;
+        if (!_typeHandlers.ContainsKey(type)) return value;
         var sqlParameter = new SqlParameter { Value = value };
-        TypeHandler[type].SetValue(sqlParameter, value);
+        _typeHandlers[type].SetValue(sqlParameter, value);
         return sqlParameter.Value;
     }
-    
-    private static readonly  object DbNull = (object) DBNull.Value;
-    public override object this[string name] => HandleValue(base[name]) ?? DbNull;
+    public override object this[string name] => HandleValue(base[name]) ?? DBNull.Value;
 
-    public override object this[int i] => HandleValue(base[i]) ?? DbNull;
+    public override object this[int i] => HandleValue(base[i]) ?? DBNull.Value;
 }
