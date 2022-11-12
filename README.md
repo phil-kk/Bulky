@@ -149,3 +149,4 @@ void BulkInsertOrUpdate<T>(this IDbConnection connection,
  |         - |  24.44 MB |
 |     DapperPlus |   ShortRun | InProcessNoEmitToolchain |              3 |           1 |     Default |           16 |           3 | 1,334.8 ms | 1,053.08 ms | 57.72 ms | 33.33 ms | 1,297.8 ms | 1,301.6 ms | 1,305.4 ms | 1,353.4 ms | 1,401.4 ms | 0.7491 | 14000.0000
  | 2000.0000 | 119.46 MB |
+
