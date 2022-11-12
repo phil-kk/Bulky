@@ -1,35 +1,32 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Reflection;
 using Dapper;
 using FastMember;
-using Microsoft.Data.SqlClient;
 
-namespace Dapper.FastBulkOperations.SqlServer;
+namespace FastBulkOperations.Root;
 
 public static class ObjectReaderExtensions
 {
-    public static DapperObjectReader<T> ToObjectDapperReader<T>(this IEnumerable<T> enumerable, params string[] members)
+    public static DapperObjectReader<T> ToObjectDapperReader<T>(this IEnumerable<T> enumerable, ISqlDialect sqlDialect, params string[] members)
     {
-        return new DapperObjectReader<T>(enumerable, members);
+        return new DapperObjectReader<T>(sqlDialect, enumerable, members);
     }
 }
 
 public sealed class DapperObjectReader<T> : ObjectReader
 {
     private static readonly Dictionary<Type, SqlMapper.ITypeHandler> _typeHandlers = typeof(SqlMapper).GetField("typeHandlers", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Static)?.GetValue(null) as Dictionary<Type, SqlMapper.ITypeHandler>;
-
-    public DapperObjectReader(IEnumerable<T> source, params string[] members) : base(typeof(T), source, members)
+    private readonly ISqlDialect _sqlDialect;
+    public DapperObjectReader(ISqlDialect sqlDialect, IEnumerable<T> source, params string[] members) : base(typeof(T), source, members)
     {
+        _sqlDialect = sqlDialect;
     }
 
-    private static object HandleValue(object value)
+    private object HandleValue(object value)
     {
         if (value is null || value == DBNull.Value) return null;
         var type = value.GetType();
         if (!_typeHandlers.ContainsKey(type)) return value;
-        var sqlParameter = new SqlParameter { Value = value };
+        var sqlParameter = _sqlDialect.CreateParameter(value);
         _typeHandlers[type].SetValue(sqlParameter, value);
         return sqlParameter.Value;
     }

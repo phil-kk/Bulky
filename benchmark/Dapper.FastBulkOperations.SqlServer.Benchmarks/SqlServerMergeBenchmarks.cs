@@ -15,7 +15,7 @@ public class SqlServerMergeBenchmarks
     [GlobalSetup]
     public void GlobalSetup()
     {
-        using var t = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;");
+        using var t = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;TrustServerCertificate=true;");
         {
             t.Execute("TRUNCATE TABLE BulkMergeTest");
         }
@@ -32,7 +32,7 @@ public class SqlServerMergeBenchmarks
         }
         using var connection = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;");
         {
-            BulkExtensions.BulkInsert(connection, temp);
+            SqlServerBulkExtensions.BulkInsert(connection, temp);
         }
         _list.AddRange(temp);
         
@@ -41,14 +41,14 @@ public class SqlServerMergeBenchmarks
     [Benchmark]
     public void FastBulkOperations()
     {
-        using var connection = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;");
-        BulkExtensions.BulkInsertOrUpdate(connection, _list);
+        using var connection = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;TrustServerCertificate=true;");
+        SqlServerBulkExtensions.BulkInsertOrUpdate(connection, _list);
     }
     
     [Benchmark]
     public void DapperPlus()
     {
-        using var connection = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;");
+        using var connection = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;TrustServerCertificate=true;");
         Z.Dapper.Plus.DapperPlusExtensions.BulkMerge(connection, _list);
     }
 }

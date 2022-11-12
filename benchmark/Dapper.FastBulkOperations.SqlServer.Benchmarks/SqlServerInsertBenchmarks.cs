@@ -29,7 +29,7 @@ public class SqlServerInsertBenchmarks
     public void FastBulkOperations()
     {
         using var connection = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;");
-        BulkExtensions.BulkInsert(connection, _list);
+        SqlServerBulkExtensions.BulkInsert(connection, _list);
     }
     
     [Benchmark]
