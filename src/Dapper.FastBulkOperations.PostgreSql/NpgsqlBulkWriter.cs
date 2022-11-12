@@ -24,12 +24,11 @@ public sealed class NpgsqlBulkWriter : IBulkWriter
         foreach (var item in items)
         { 
             writer.StartRow();
-            foreach (var columnMapping in columnsMapping)
+            foreach (var value in columnsMapping.Select(columnMapping => accessor[item, columnMapping.Value.Name]))
             {
-                var value = accessor[item, columnMapping.Value.Name];
                 if (value is not null)
                 {
-                    var type = value.GetType() == typeof(Nullable<>) ? value.GetType().GetEnumUnderlyingType() : value.GetType();
+                    var type = value.GetType() == typeof(Nullable<>) ? Nullable.GetUnderlyingType(value.GetType()) : value.GetType();
                     if (type.IsEnum)
                     {
                         var underlying = Enum.GetUnderlyingType(type);
@@ -48,8 +47,10 @@ public sealed class NpgsqlBulkWriter : IBulkWriter
                         writer.Write(Convert.ChangeType(value, typeof(double)), NpgsqlDbType.Double);
                         continue;
                     }
+                    writer.Write(value);
+                    continue;
                 }
-                writer.Write(value);
+                writer.WriteNull();
             }
         }
 
@@ -66,14 +67,13 @@ public sealed class NpgsqlBulkWriter : IBulkWriter
         await using var writer = await (connection as NpgsqlConnection)?.BeginBinaryImportAsync($"COPY \"{tableName}\" ({columnsString}) FROM STDIN (FORMAT BINARY)");
         var row = new object[columnsMapping.Count];
         foreach (var item in items)
-        { 
+        {
             await writer.StartRowAsync();
-            foreach (var columnMapping in columnsMapping)
+            foreach (var value in columnsMapping.Select(columnMapping => accessor[item, columnMapping.Value.Name]))
             {
-                var value = accessor[item, columnMapping.Value.Name];
                 if (value is not null)
                 {
-                    var type = value.GetType() == typeof(Nullable<>) ? value.GetType().GetEnumUnderlyingType() : value.GetType();
+                    var type = value.GetType() == typeof(Nullable<>) ? Nullable.GetUnderlyingType(value.GetType()) : value.GetType();
                     if (type.IsEnum)
                     {
                         var underlying = Enum.GetUnderlyingType(type);
@@ -92,8 +92,10 @@ public sealed class NpgsqlBulkWriter : IBulkWriter
                         await writer.WriteAsync(Convert.ChangeType(value, typeof(double)), NpgsqlDbType.Double);
                         continue;
                     }
+                    await writer.WriteAsync(value);
+                    continue;
                 }
-                await writer.WriteAsync(value);
+                await writer.WriteNullAsync();
             }
         }
 
