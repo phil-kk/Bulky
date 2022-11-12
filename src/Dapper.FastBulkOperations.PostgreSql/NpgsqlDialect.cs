@@ -42,7 +42,7 @@ public sealed class NpgsqlDialect : ISqlDialect
     ORDER BY
     attnum ASC LIMIT 1";
 
-    public string GetCreateTempTableQuery(string tempTableName, string destination, IEnumerable<string> columnNames = null) => $"SELECT * INTO \"{tempTableName}\" FROM \"{destination}\" WHERE 1 = 0;";
+    public string GetCreateTempTableQuery(string tempTableName, string destination, IEnumerable<string> columnNames = null) => $"SELECT * INTO TEMP \"{tempTableName}\" FROM \"{destination}\" WHERE 1 = 0;";
 
     public string GetInsertOrUpdateMergeStatement(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
     {
