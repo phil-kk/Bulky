@@ -10,7 +10,7 @@ namespace Dapper.FastBulkOperations.PostgreSql;
 
 public sealed class NpgsqlDialect : ISqlDialect
 {
-    public string GetFindPrimaryKeysQuery(string tableName)
+    public string GetFindPrimaryKeysQuery(string databaseName, string tableName)
         => $@"SELECT       
     pg_attribute.attname
     FROM pg_catalog.pg_index, pg_catalog.pg_class, pg_catalog.pg_attribute, pg_catalog.pg_namespace 
@@ -23,7 +23,7 @@ public sealed class NpgsqlDialect : ISqlDialect
     pg_attribute.attnum = any(pg_index.indkey)
     AND indisprimary";
 
-    public string GetFindIdentityQuery(string tableName)
+    public string GetFindIdentityQuery(string databaseName, string tableName)
         => @$"SELECT
     pg_attribute.attname as ""ColumnName"",
     format_type(pg_attribute.atttypid, pg_attribute.atttypmod) as ""Type""
@@ -100,7 +100,7 @@ ALTER TABLE ""{tempTableName}"" ADD ""{identity.ColumnName}"" {identity.Type}";
         }
         else
         {
-            merge.Append(insertClause);
+            merge.Append($"{insertClause};DROP TABLE \"{bulkWriteContext.TempTable}\"");
         }
 
         return merge.ToString();
@@ -110,7 +110,8 @@ ALTER TABLE ""{tempTableName}"" ADD ""{identity.ColumnName}"" {identity.Type}";
         => @$"UPDATE ""{bulkWriteContext.TableName}"" AS d 
         SET {string.Join(',', columnNames.Except(bulkWriteContext.PrimaryKeys).Select(x => $"\"{x}\" = s.\"{x}\""))}
 FROM ""{bulkWriteContext.TempTable}"" AS s
-WHERE {string.Join(" AND ", bulkWriteContext.PrimaryKeys.Select(x => $"d.\"{x}\" = s.\"{x}\""))}";
+WHERE {string.Join(" AND ", bulkWriteContext.PrimaryKeys.Select(x => $"d.\"{x}\" = s.\"{x}\""))};
+DROP TABLE ""{bulkWriteContext.TempTable}""";
 
     public string GetDeleteQuery(BulkWriteContext createTempTableResult)
         => $@"

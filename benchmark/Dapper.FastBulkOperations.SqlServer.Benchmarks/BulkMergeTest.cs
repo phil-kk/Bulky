@@ -7,7 +7,5 @@ internal class BulkMergeTest
 {
     [Column("Id")]
     public int Id { get; set; }
-    public string Name { get; set; }
-    public decimal Amount { get; set; }
-    public TestInt Enum { get; set; }
+    public string TestVarchar { get; set; }
 }

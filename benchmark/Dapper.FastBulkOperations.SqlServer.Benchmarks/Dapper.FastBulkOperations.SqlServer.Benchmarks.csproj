@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\Dapper.FastBulkOperations.MySql\Dapper.FastBulkOperations.MySql.csproj" />
       <ProjectReference Include="..\..\src\Dapper.FastBulkOperations.PostgreSql\Dapper.FastBulkOperations.PostgreSql.csproj" />
       <ProjectReference Include="..\..\src\Dapper.FastBulkOperations.SqlServer\Dapper.FastBulkOperations.SqlServer.csproj" />
     </ItemGroup>

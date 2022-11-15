@@ -8,7 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\Dapper.FastBulkOperations.MySql\Dapper.FastBulkOperations.MySql.csproj" />
       <ProjectReference Include="..\..\src\Dapper.FastBulkOperations.SqlServer\Dapper.FastBulkOperations.SqlServer.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MySqlConnector" Version="2.2.0" />
     </ItemGroup>
 
 </Project>

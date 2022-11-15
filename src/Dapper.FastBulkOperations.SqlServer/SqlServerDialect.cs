@@ -9,11 +9,11 @@ namespace Dapper.FastBulkOperations.SqlServer;
 
 public sealed class SqlServerDialect : ISqlDialect
 {
-    public string GetFindPrimaryKeysQuery(string tableName)
+    public string GetFindPrimaryKeysQuery(string databaseName,string tableName)
         => $"SELECT COLUMN_NAME as ColumnName, DATA_TYPE as Type FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMNPROPERTY(OBJECT_ID(TABLE_SCHEMA + '.' + TABLE_NAME), COLUMN_NAME, 'IsIdentity') = 1 AND TABLE_NAME = '{tableName}'";
 
 
-    public string GetFindIdentityQuery(string tableName)
+    public string GetFindIdentityQuery(string databaseName,string tableName)
         => $"SELECT COLUMN_NAME as ColumnName, DATA_TYPE as Type FROM INFORMATION_SCHEMA.COLUMNS WHERE COLUMNPROPERTY(OBJECT_ID(TABLE_SCHEMA + '.' + TABLE_NAME), COLUMN_NAME, 'IsIdentity') = 1 AND TABLE_NAME = '{tableName}'";
 
 

@@ -21,7 +21,7 @@ public class SqlServerInsertBenchmarks
         connection.Execute("TRUNCATE TABLE BulkMergeTest");
         for (var i = 0; i < 100000; i++)
         {
-            _list.Add(new BulkMergeTest { Amount = i, Name = $"Test{1}", Enum = TestInt.Val});
+            _list.Add(new BulkMergeTest {TestVarchar = $"Test{1}"});
         }
     }
     

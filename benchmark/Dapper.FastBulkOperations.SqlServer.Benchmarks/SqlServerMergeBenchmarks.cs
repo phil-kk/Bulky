@@ -24,11 +24,11 @@ public class SqlServerMergeBenchmarks
         var temp = new List<BulkMergeTest>();
         for (var i = 0; i < 50000; i++)
         {
-            temp.Add(new BulkMergeTest {  Amount = i, Name = $"test{10 + i}", Enum = TestInt.Val});
+            temp.Add(new BulkMergeTest {  TestVarchar = $"test{10 + i}"});
         }
         for (var i = 0; i < 50000; i++)
         {
-            _list.Add(new BulkMergeTest {  Amount = i, Name = $"test{10 + i}", Enum = TestInt.Val});
+            _list.Add(new BulkMergeTest {   TestVarchar = $"test{10 + i}"});
         }
         using var connection = new SqlConnection("Server=localhost;Database=DapperTest;Trusted_Connection=True;");
         {

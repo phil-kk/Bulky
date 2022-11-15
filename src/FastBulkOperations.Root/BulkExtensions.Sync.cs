@@ -194,14 +194,14 @@ public static partial class BulkExtensions
     private static Identity FindIdentityInfo(ISqlDialect dialect, DbConnection connection, DbTransaction transaction,
         string tableName)
     {
-        using var reader = ExecuteReader(connection, dialect.GetFindIdentityQuery(tableName), transaction);
+        using var reader = ExecuteReader(connection, dialect.GetFindIdentityQuery(connection.Database, tableName), transaction);
         return reader.Read() ? new Identity(reader[0].ToString(), reader[1].ToString()) : null;
     }
 
     private static IEnumerable<string> FindPrimaryKeysInfo(ISqlDialect dialect, DbConnection connection,
         DbTransaction transaction, string tableName)
     {
-        using var reader = ExecuteReader(connection, dialect.GetFindPrimaryKeysQuery(tableName), transaction);
+        using var reader = ExecuteReader(connection, dialect.GetFindPrimaryKeysQuery(connection.Database, tableName), transaction);
         while (reader.Read())
         {
             yield return reader[0].ToString();

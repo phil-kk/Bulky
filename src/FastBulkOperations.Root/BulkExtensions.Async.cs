@@ -155,8 +155,8 @@ public static partial class BulkExtensions
              primaryKeys ?? cacheItem.PrimaryKeys, 
              timeout);
          columnNames = result.Identity is null ? columnNames : columnNames.Where(x => x != result.Identity.ColumnName);
-
-         await ExecuteAsync(connection, dialect.GetUpdateQuery(columnNames, result), transaction);
+         var sql = dialect.GetUpdateQuery(columnNames, result);
+         await ExecuteAsync(connection, sql, transaction);
          if (shouldCloseConnection) await connection.CloseAsync();
      }
      
@@ -205,14 +205,14 @@ public static partial class BulkExtensions
 
     private static async Task<Identity> FindIdentityInfoAsync(ISqlDialect dialect, DbConnection connection, DbTransaction transaction, string tableName)
     {
-        await using var reader = await ExecuteReaderAsync(connection, dialect.GetFindIdentityQuery(tableName), transaction);
+        await using var reader = await ExecuteReaderAsync(connection, dialect.GetFindIdentityQuery(connection.Database, tableName), transaction);
         return await reader.ReadAsync() ? new Identity(reader[0].ToString(), reader[1].ToString()) : null;
     }
     
     private static async Task<IEnumerable<string>> FindPrimaryKeysInfoAsync(ISqlDialect dialect, DbConnection connection, DbTransaction transaction, string tableName)
     {
         var result = new List<string>();
-        await using var reader = await ExecuteReaderAsync(connection,dialect.GetFindPrimaryKeysQuery(tableName), transaction);
+        await using var reader = await ExecuteReaderAsync(connection,dialect.GetFindPrimaryKeysQuery(connection.Database, tableName), transaction);
         while (await reader.ReadAsync())
         {
             result.Add(reader[0].ToString());
