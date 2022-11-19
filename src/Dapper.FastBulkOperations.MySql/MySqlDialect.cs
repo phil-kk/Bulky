@@ -24,7 +24,7 @@ public sealed class MySqlDialect : ISqlDialect
     FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{databaseName}' AND TABLE_NAME = '{tableName}'
     AND EXTRA = 'auto_increment'";
 
-    public string GetCreateTempTableQuery(string tempTableName, string destination, IEnumerable<string> columnNames = null) => $"CREATE TABLE IF NOT EXISTS `{tempTableName.CutTempTableName()}` AS (SELECT * FROM `{destination}` WHERE 1=0);";
+    public string GetCreateTempTableQuery(string tempTableName, string destination, IEnumerable<string> columnNames = null) => $"CREATE TEMPORARY TABLE IF NOT EXISTS `{tempTableName.CutTempTableName()}` AS (SELECT * FROM `{destination}` WHERE 1=0);";
 
     public string GetInsertOrUpdateMergeStatement(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
     {
