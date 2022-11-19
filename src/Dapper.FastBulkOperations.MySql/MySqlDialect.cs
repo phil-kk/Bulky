@@ -1,4 +1,7 @@
+using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Text;
 using FastBulkOperations.Root;
 using MySqlConnector;
@@ -26,7 +29,6 @@ public sealed class MySqlDialect : ISqlDialect
     public string GetInsertOrUpdateMergeStatement(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
     {
         var identityExist = bulkWriteContext.Identity is not null;
-        //columnNames = identityExist ? columnNames.Where(x => x != bulkWriteContext.Identity.ColumnName) : columnNames;
         var merge = new StringBuilder();
         var columnsString = string.Join(',', columnNames.Select(x => $"`{x}`"));
         var primaryKeysMatchString =
@@ -84,10 +86,9 @@ DROP TABLE `{bulkWriteContext.TempTable.CutTempTableName()}`");
     {
         var primaryKeysMatchString =
             string.Join(" AND ", bulkWriteContext.PrimaryKeys.Select(x => $"`{bulkWriteContext.TableName}`.`{x}` = `{bulkWriteContext.TempTable}`.`{x}`"));
-        var updt =  @$"UPDATE `{bulkWriteContext.TableName}` INNER JOIN `{bulkWriteContext.TempTable.CutTempTableName()}`ON ({primaryKeysMatchString})
+        return @$"UPDATE `{bulkWriteContext.TableName}` INNER JOIN `{bulkWriteContext.TempTable.CutTempTableName()}`ON ({primaryKeysMatchString})
         SET {string.Join(',', columnNames.Except(bulkWriteContext.PrimaryKeys).Select(x => $"`{bulkWriteContext.TableName}`.`{x}` = `{bulkWriteContext.TempTable.CutTempTableName()}`.`{x}`"))}
-;DROP TABLE `{bulkWriteContext.TempTable.CutTempTableName()}`";
-        return updt;
+;DROP TABLE `{bulkWriteContext.TempTable.CutTempTableName()}`";;
     }
     
     public string GetDeleteQuery(BulkWriteContext createTempTableResult)

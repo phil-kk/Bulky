@@ -6,7 +6,7 @@
     <Description>Extra Fast bulk Insert / Update / InserOrUpdate / Delete operations for Dapper</Description>
     <RepositoryUrl>https://github.com/filipppka/Dapper.FastBulkOperations</RepositoryUrl>
     <PackageTags>dapper,dapper bulk,bulkcopy,bulkmerge,insertorupdate,bulkdelete,bulkmerge,bulkinsert,dapper insert,dapper update,dapper delete,dapper merge</PackageTags>
-    <PackageVersion>1.1.0</PackageVersion>
+    <PackageVersion>1.2.0</PackageVersion>
     <Title>Dapper.FastBulkOperations.SqlSver</Title>
     <PackageProjectUrl>https://github.com/filipppka/Dapper.FastBulkOperations</PackageProjectUrl>
     <PackageLicenseUrl>https://licenses.nuget.org/Apache-2.0</PackageLicenseUrl>
