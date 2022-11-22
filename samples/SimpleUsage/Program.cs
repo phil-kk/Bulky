@@ -1,20 +1,20 @@
 ﻿
 using Dapper;
-using Dapper.FastBulkOperations.MySql;
 using Dapper.FastBulkOperations.SqlServer;
-using MySqlConnector; // or System.Data.SqlClient
+using Microsoft.Data.SqlClient; // or System.Data.SqlClient
 
-const string connectionString = "Server=localhost;Database=tempdb;Uid=root;Pwd=1;Port=13306;AllowLoadLocalInfile=true;Allow User Variables=true";
+const string connectionString = "Server=localhost;Database=tempdb;Trusted_Connection=True;TrustServerCertificate=true;";
 
-await using var create = new MySqlConnection(connectionString);
+await using var create = new SqlConnection(connectionString);
 {
-    create.Execute("CREATE TABLE IF NOT EXISTS `Person` (`IdentityId` INT NOT NULL AUTO_INCREMENT PRIMARY KEY, `FullName` NVARCHAR(255) NOT NULL, `intTest` INT)");
+    create.Execute($"IF OBJECT_ID('Person', 'U') IS NOT NULL DROP TABLE [Person]");
+    create.Execute("CREATE TABLE [Person] ([IdentityId] INT NOT NULL IDENTITY(-1,-1) PRIMARY KEY, [FullName] NVARCHAR(255) NOT NULL)");
 }
 
-var people = new List<Person> { new Person { FullName = "Filipp Kleymenov"}, new Person { FullName = "John Ellison ", intTest = 1}};
+var people = new List<Person> { new Person { FullName = "Filipp Kleymenov"}, new Person { FullName = "John Ellison "}};
 
-await using var sqlConnection = new MySqlConnection(connectionString);
-sqlConnection.BulkUpdate(people);
+await using var sqlConnection = new SqlConnection(connectionString);
+sqlConnection.BulkInsert(people);
 
 foreach (var person in people)
 {
@@ -27,6 +27,4 @@ public class Person
     public int IdentityId { get; set; }
     
     public string FullName { get; set; }
-    
-    public int intTest { get; set; }
 }
