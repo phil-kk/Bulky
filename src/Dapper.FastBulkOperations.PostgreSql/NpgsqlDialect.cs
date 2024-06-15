@@ -58,11 +58,9 @@ public sealed class NpgsqlDialect : ISqlDialect
         WHERE {primaryKeysMatchString}
         RETURNING {string.Join(',', bulkWriteContext.PrimaryKeys.Select(x => $"d.\"{x}\""))}
             )
-        MERGE INTO ""{bulkWriteContext.TempTable}"" d
-            USING ""updated"" s
-            ON {primaryKeysMatchString}
-        WHEN MATCHED THEN
-            DELETE;");
+DELETE 
+FROM ""{bulkWriteContext.TempTable}"" d
+     USING ""updated"" s WHERE {primaryKeysMatchString};");
         var insertClause = @$"INSERT INTO ""{bulkWriteContext.TableName}"" ({columnsString})
         SELECT {columnsString} FROM ""{bulkWriteContext.TempTable}""";
         if (identityExist)
@@ -115,11 +113,9 @@ DROP TABLE ""{bulkWriteContext.TempTable}""";
 
     public string GetDeleteQuery(BulkWriteContext createTempTableResult)
         => $@"
-MERGE INTO ""{createTempTableResult.TableName}"" AS T  
-USING (SELECT * FROM ""{createTempTableResult.TempTable}"") AS S
-ON ({string.Join(" AND ", createTempTableResult.PrimaryKeys.Select(x => @$"S.""{x}"" = T.""{x}"""))})
-WHEN MATCHED
-THEN DELETE;
+DELETE 
+FROM ""{createTempTableResult.TableName}"" s
+     USING ""{createTempTableResult.TempTable}"" t WHERE {string.Join(" AND ", createTempTableResult.PrimaryKeys.Select(x => @$"s.""{x}"" = t.""{x}"""))};
 DROP TABLE ""{createTempTableResult.TempTable}""";
 
     public string GetTempTableName(string targetTableName) => $"{targetTableName}_{Guid.NewGuid():N}";

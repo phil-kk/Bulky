@@ -6,7 +6,7 @@ public class InsertOrUpdateTests: PgSqlTestsBase
 {
     [Theory]
     [InlineData(true)]
-    //[InlineData(false)]
+    [InlineData(false)]
     public async Task Should_Pass_When_All_Inserted_Fields_Are_Valid(bool sync)
     {
         var tableName = $"AllFieldTypesTests_{Guid.NewGuid():N}";
