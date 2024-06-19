@@ -8,6 +8,18 @@ using Npgsql;
 
 namespace Dapper.FastBulkOperations.PostgreSql;
 
+
+public class BulkWriterContext
+{
+    public string TableName { get; set; }
+   // public
+}
+
+public class ColumnMapping
+{
+    public string Name { get; set; }
+}
+
 public sealed class NpgsqlDialect : ISqlDialect
 {
     public string GetFindPrimaryKeysQuery(string databaseName, string tableName)

@@ -14,7 +14,7 @@
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
         <Authors>Filipp Kleymenov</Authors>
         <PackageId>Dapper.FastBulkOperations.MySql</PackageId>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>

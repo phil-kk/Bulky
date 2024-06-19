@@ -8,6 +8,7 @@ public record BulkWriteContext(
     IEnumerable<string> PrimaryKeys,
     Identity Identity);
 
+
 public record Identity(string ColumnName, string Type);
 
 public interface ISqlDialect

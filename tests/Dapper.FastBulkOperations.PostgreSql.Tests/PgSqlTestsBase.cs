@@ -111,7 +111,7 @@ public class PgSqlTestsBase
 					""EnumValue"" smallint NULL,
 					""BigTextValue"" text COLLATE pg_catalog.""default"",
 					""IntValue"" integer NULL,
-					""DecimalValue"" double precision NULL,
+					""DecimalValue"" decimal NULL,
                     ""GuidValue"" uuid NULL,
                     ""CreateDate"" date NULL)");
 	    }

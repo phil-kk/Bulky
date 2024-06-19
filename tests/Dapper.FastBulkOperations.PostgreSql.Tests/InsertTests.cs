@@ -1,12 +1,77 @@
 using Npgsql;
-
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using Z.Dapper.Plus;
 namespace Dapper.FastBulkOperations.PostgreSql.Tests
 {
     public class InsertTests : PgSqlTestsBase
     {
+        List<AllFieldTypesWithIdentityTests> Generate(int count = 10_000)
+        {
+            return Enumerable.Range(0, count).Select(x => new AllFieldTypesWithIdentityTests
+            {
+                BigTextValue = $"TextTextText {x}",
+                CreateDate = DateTime.Now.AddSeconds(x),
+                DecimalValue = x,
+                EnumValue = EnumValue.First,
+                GuidValue = Guid.NewGuid(),
+                IntValue = x,
+                NvarcharValue = $"Test {x}"
+            }).ToList();
+        }
+
+        [Fact]
+        public async Task Test1()
+        {
+            DapperPlusManager
+                .Entity<AllFieldTypesWithIdentityTests>()
+                .Table(nameof(AllFieldTypesWithIdentityTests))
+                .Identity(x => x.Id, true);
+
+            var list = Generate(1000);
+            var list2 = Generate(1000);
+            CreateAllFieldsTable(nameof(AllFieldTypesWithIdentityTests));
+
+            var stopwatch = Stopwatch.StartNew(); 
+            using var connection = new NpgsqlConnection(ConnectionString);
+            connection.Open();
+            await connection.BulkInsertOrUpdateAsync(list, nameof(AllFieldTypesWithIdentityTests), excludeProperties: new[] { "DecimalValue" } );
+
+            var elapsed = stopwatch.Elapsed;
+            stopwatch.Restart();
+
+            await connection.BulkInsertOrUpdateAsync(list, nameof(AllFieldTypesWithIdentityTests), excludeProperties: new[] { "DecimalValue" });
+            elapsed = stopwatch.Elapsed;
+            ;
+            stopwatch.Restart();
+            using var c = new NpgsqlConnection(ConnectionString);
+            c.Open();
+            await (c as IDbConnection).BulkMergeAsync(list2); 
+            elapsed = stopwatch.Elapsed;
+            ;
+        }
+
+        [Fact]
+        public async Task Test2()
+        {
+            var list = Generate(10_000_000);
+            CreateAllFieldsTable(nameof(AllFieldTypesWithIdentityTests));
+
+            var stopwatch = Stopwatch.StartNew(); 
+            using var connection = new NpgsqlConnection(ConnectionString);
+            connection.Open();
+            await connection.BulkInsertAsync(list);
+            //await (connection as IDbConnection).BulkInsertAsync(list);
+
+            var elapsed = stopwatch.Elapsed;
+            ;
+        }
+
         [Theory]
         [InlineData(true)]
-        //[InlineData(false)]
+        [InlineData(false)]
         public async Task Should_Pass_When_All_Inserted_Fields_Are_Valid(bool sync)
         {
             var tableName = $"AllFieldTypesTests_{Guid.NewGuid():N}";
