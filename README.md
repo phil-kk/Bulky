@@ -20,6 +20,8 @@ await using var create = new SqlConnection(connectionString);
     create.Execute("CREATE TABLE [Person] ([IdentityId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, [FullName] NVARCHAR(255) NOT NULL)");
 }
 
+
+
 var people = new List<Person> { new Person { FullName = "A B"}, new Person { FullName = "C D"}};
 
 await using var sqlConnection = new SqlConnection(connectionString);
