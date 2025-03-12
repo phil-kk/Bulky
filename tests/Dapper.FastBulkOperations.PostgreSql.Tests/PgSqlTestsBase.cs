@@ -1,19 +1,42 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dapper;
 using Npgsql;
 
-namespace Dapper.FastBulkOperations.PostgreSql.Tests;
+namespace Bulky.PostgreSql.Tests;
 
 public class  AllFieldTypesWithIdentityTests
 {
-	public long Id { get; set;}
-	public string NvarcharValue { get; set; }
-	public EnumValue EnumValue { get; set;}
-	public string BigTextValue { get; set; }
-	public int IntValue { get; set; }
-	public decimal DecimalValue { get; set;}
-	public Guid GuidValue { get; set;}
-	public DateTime CreateDate { get; set; }
+    public long Id { get; set; }
+    public string VarcharValue { get; set; }
+    public string TextValue { get; set; }
+    public char CharValue { get; set; }
+    public bool BooleanValue { get; set; }
+    public short SmallIntValue { get; set; }
+    public int IntValue { get; set; }
+    public long BigIntValue { get; set; }
+    public decimal DecimalValue { get; set; }
+    public float RealValue { get; set; }
+    public double DoublePrecisionValue { get; set; }
+
+    // Даты и время
+    public DateTime? DateValue { get; set; }  // date
+    public TimeSpan? TimeValue { get; set; }  // time
+    public DateTime TimestampValue { get; set; }
+    public DateTimeOffset? TimestampTzValue { get; set; }  // timestamptz
+
+    public Guid UuidValue { get; set; }
+    public string JsonValue { get; set; }
+    public byte[] ByteaValue { get; set; }
+
+    public List<JsontTest> JsonbValue { get; set; }
+}
+
+public class JsontTest
+{ 
+    public string Test { get; set; }
+    public int Test2 { get; set; }
+    public decimal Decimal2 { get; set; }
 }
 
 [Table("AttributeBasedMapping_Test")]
@@ -54,7 +77,7 @@ public class PgSqlTestsBase
 	protected readonly string BigText = string.Join(string.Empty, Enumerable.Range(0, 1000).Select(x => x.ToString()));
 	protected readonly DateTime DateTime = new DateTime(2022, 1, 1);
 	protected readonly string XmlValue = "<root><text>test</text></root>";
-    protected static string ConnectionString = "Server=localhost; Port=5432; User Id=postgres; Password=1; Database=tempdb";
+    protected static string ConnectionString = "";
 
     protected void DropTable(string name)
     {
@@ -97,26 +120,57 @@ public class PgSqlTestsBase
                 );");
 	    }
     }
-    
+
     protected void CreateAllFieldsTable(string name)
     {
-	    using var connection = new NpgsqlConnection(ConnectionString);
-	    {
-		    connection.Open();
-		    connection.Execute($@"{GetDropTableQuery(name)}
-                CREATE TABLE ""{name}""
-                (
-                    ""Id"" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1) PRIMARY KEY,
-                    ""NvarcharValue"" character varying(100) NULL,
-					""EnumValue"" smallint NULL,
-					""BigTextValue"" text COLLATE pg_catalog.""default"",
-					""IntValue"" integer NULL,
-					""DecimalValue"" decimal NULL,
-                    ""GuidValue"" uuid NULL,
-                    ""CreateDate"" date NULL)");
-	    }
+        using var connection = new NpgsqlConnection(ConnectionString);
+        {
+            connection.Open();
+            connection.Execute($@"
+            {GetDropTableQuery(name)}
+            CREATE TABLE ""{name}""
+            (
+                ""Id"" bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                ""VarcharValue"" varchar(255) NULL,
+                ""TextValue"" text NULL,
+                ""CharValue"" char(1) NULL,
+                ""BooleanValue"" boolean NULL,
+                ""SmallIntValue"" smallint NULL,
+                ""IntValue"" integer NULL,
+                ""BigIntValue"" bigint NULL,
+                ""DecimalValue"" decimal(10, 4) NULL,
+                ""RealValue"" real NULL,
+                ""DoublePrecisionValue"" double precision NULL,
+                
+                -- Даты и время
+                ""DateValue"" date NULL,
+                ""TimeValue"" time NULL,
+                ""TimestampValue"" timestamp NULL,
+                ""TimestampTzValue"" timestamptz NULL,
+                ""IntervalValue"" interval NULL,
+
+                ""UuidValue"" uuid NULL,
+                ""JsonValue"" json NULL,
+                ""JsonbValue"" jsonb NULL,
+                ""ByteaValue"" bytea NULL,
+                ""InetValue"" inet NULL,
+                ""CidrValue"" cidr NULL,
+                ""MacAddrValue"" macaddr NULL,
+                ""IntArray"" integer[] NULL,
+                ""TextArray"" text[] NULL,
+                ""UuidArray"" uuid[] NULL,
+                ""PointValue"" point NULL,
+                ""LineValue"" line NULL,
+                ""LsegValue"" lseg NULL,
+                ""BoxValue"" box NULL,
+                ""PathValue"" path NULL,
+                ""PolygonValue"" polygon NULL,
+                ""CircleValue"" circle NULL
+            )");
+        }
     }
-    
+
+
     protected void InsertAttributeBasedMapping(string tableName, AttributeBasedMapping fields, bool includeNotMapped)
     {
 	    using var connection = new NpgsqlConnection(ConnectionString);
@@ -180,14 +234,9 @@ public class PgSqlTestsBase
     {
 	    var count = select.Count();
 	    Assert.Equal(count, items.Count());
-	    Assert.True(select.All(x => x.EnumValue == EnumValue.Second));
 	    Assert.True(select.Select(x => x.Id).SequenceEqual(items.Select(x => x.Id)));
-	    Assert.True(select.All(x => x.BigTextValue == BigText));
-	    Assert.True(select.All(x => x.CreateDate == DateTime));
 	    Assert.True(select.OrderBy(x => x.IntValue).Select(x => x.IntValue).SequenceEqual(Enumerable.Range(0, count)));
 	    Assert.True(select.OrderBy(x => x.DecimalValue).Select(x => x.DecimalValue).SequenceEqual(Enumerable.Range(0, count).Select(x => (decimal)x)));
-	    Assert.True(select.OrderBy(x => x.NvarcharValue).Select(x => x.NvarcharValue).SequenceEqual(Enumerable.Range(0, count).Select(x => $"Test {x}").OrderBy(x => x)));
-	    Assert.True(select.All(x => x.GuidValue != Guid.Empty));
     }
     
     private string GetDropTableQuery(string name) =>

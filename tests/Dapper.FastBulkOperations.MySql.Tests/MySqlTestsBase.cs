@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using MySqlConnector;
 
-namespace Dapper.FastBulkOperations.MySql.Tests;
+namespace Bulky.MySql.Tests;
 
 public class MySqlGuidTypeHandler : SqlMapper.TypeHandler<Guid>
 {

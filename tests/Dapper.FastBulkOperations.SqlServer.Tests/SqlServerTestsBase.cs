@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.Data.SqlClient;
 
-namespace Dapper.FastBulkOperations.SqlServer.Tests;
+namespace Bulky.SqlServer.Tests;
 
 public class  AllFieldTypesWithIdentityTests
 {

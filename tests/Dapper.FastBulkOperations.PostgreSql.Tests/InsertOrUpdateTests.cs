@@ -1,6 +1,8 @@
+using Bulky.PostgreSql;
+using Dapper;
 using Npgsql;
 
-namespace Dapper.FastBulkOperations.PostgreSql.Tests;
+namespace Bulky.PostgreSql.Tests;
 
 public class InsertOrUpdateTests: PgSqlTestsBase
 {
@@ -15,22 +17,12 @@ public class InsertOrUpdateTests: PgSqlTestsBase
             CreateAllFieldsTable(tableName);
             var id1 = InsertAllFields(tableName,new  AllFieldTypesWithIdentityTests
             {
-                GuidValue = Guid.NewGuid(),
-                BigTextValue = "BigText1",
-                CreateDate = DateTime.Now,
                 DecimalValue = -1,
-                NvarcharValue = $"NotTest -1",
-                EnumValue = EnumValue.First,
                 IntValue = -1
             });
             var id2 = InsertAllFields(tableName, new AllFieldTypesWithIdentityTests
             {
-                GuidValue = Guid.NewGuid(),
-                BigTextValue = "BigText1",
-                CreateDate = DateTime.Now,
                 DecimalValue = -2,
-                NvarcharValue = $"NotTest -1",
-                EnumValue = EnumValue.Third,
                 IntValue = -2
             });
             var items = new List<AllFieldTypesWithIdentityTests>
@@ -38,23 +30,12 @@ public class InsertOrUpdateTests: PgSqlTestsBase
                 new AllFieldTypesWithIdentityTests
                 {
                     Id = id1,
-                    GuidValue = Guid.NewGuid(),
-                    BigTextValue = BigText,
-                    CreateDate = DateTime,
                     DecimalValue = 0,
-                    NvarcharValue = $"Test 0",
-                    EnumValue = EnumValue.Second,
                     IntValue = 0
                 },
                 new AllFieldTypesWithIdentityTests
                 {
                     Id = id2, 
-                    GuidValue = Guid.NewGuid(),
-                    BigTextValue = BigText,
-                    CreateDate = DateTime,
-                    DecimalValue = 1,
-                    NvarcharValue = $"Test 1",
-                    EnumValue = EnumValue.Second,
                     IntValue = 1
                 }
             };
@@ -62,12 +43,7 @@ public class InsertOrUpdateTests: PgSqlTestsBase
             {
                 items.Add(new AllFieldTypesWithIdentityTests
                 {
-                    GuidValue = Guid.NewGuid(),
-                    BigTextValue = BigText,
-                    CreateDate = DateTime,
                     DecimalValue = 2 + i,
-                    NvarcharValue = $"Test {2 + i}",
-                    EnumValue = EnumValue.Second,
                     IntValue = 2 + i
                 });
             }

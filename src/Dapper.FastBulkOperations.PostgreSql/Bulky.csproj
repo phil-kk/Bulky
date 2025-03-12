@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <LangVersion>10</LangVersion>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Description>Extra Fast bulk Insert / Update / InserOrUpdate / Delete operations for Dapper</Description>
+        <RepositoryUrl>https://github.com/phil-kk/Dapper.Bulky</RepositoryUrl>
+        <PackageTags>dapper, npgsql, postgresql, dapper bulk,bulkcopy,bulkmerge,insertorupdate,bulkdelete,bulkmerge,bulkinsert,dapper insert,dapper update,dapper delete,dapper merge</PackageTags>
+        <PackageVersion>1.0.0</PackageVersion>
+        <Title>BulkyDB</Title>
+        <PackageProjectUrl>https://github.com/phil-kk/Dapper.Bulky</PackageProjectUrl>
+        <PackageLicenseUrl>https://licenses.nuget.org/Apache-2.0</PackageLicenseUrl>
+        <license>https://licenses.nuget.org/Apache-2.0</license>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <Authors>Filipp Kleymenov</Authors>
+        <PackageId>BulkyDB</PackageId>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Dapper" Version="2.1.66" />
+      <PackageReference Include="FastMember" Version="1.5.0" />
+      <PackageReference Include="Microsoft.Data.SqlClient" Version="6.0.1" />
+      <PackageReference Include="MySqlConnector" Version="2.4.0" />
+      <PackageReference Include="Npgsql" Version="9.0.3" />
+    </ItemGroup>
+
+</Project>

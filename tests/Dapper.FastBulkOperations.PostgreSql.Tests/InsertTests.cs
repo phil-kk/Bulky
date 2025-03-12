@@ -1,10 +1,17 @@
+using Bulky.PostgreSql;
+using Bulky.PostgreSql.PostgreSql;
+using Bulky.Root;
+using Dapper;
+using FastMember;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Newtonsoft.Json;
 using Npgsql;
+using NpgsqlTypes;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using Z.Dapper.Plus;
-namespace Dapper.FastBulkOperations.PostgreSql.Tests
+namespace Bulky.PostgreSql.Tests
 {
     public class InsertTests : PgSqlTestsBase
     {
@@ -12,61 +19,68 @@ namespace Dapper.FastBulkOperations.PostgreSql.Tests
         {
             return Enumerable.Range(0, count).Select(x => new AllFieldTypesWithIdentityTests
             {
-                BigTextValue = $"TextTextText {x}",
-                CreateDate = DateTime.Now.AddSeconds(x),
-                DecimalValue = x,
-                EnumValue = EnumValue.First,
-                GuidValue = Guid.NewGuid(),
+                VarcharValue = $"Test {x}",
+                TextValue = $"Some long text {x}",
+                CharValue = (char)('A' + (x % 26)),
+                BooleanValue = x % 2 == 0,
+                SmallIntValue = (short)(x % short.MaxValue),
                 IntValue = x,
-                NvarcharValue = $"Test {x}"
+                BigIntValue = x * 1000L,
+                DecimalValue = (decimal)(x * 0.1),
+
+                RealValue = (float)(x * 0.1),
+                DoublePrecisionValue = x * 0.0001,
+                
+                DateValue = count % 2 == 0 ? DateTime.UtcNow.AddDays(-x) : null,
+                TimestampValue = DateTime.UtcNow,
+                TimeValue = TimeSpan.FromSeconds(x % 86400),
+                TimestampTzValue = DateTimeOffset.UtcNow.AddSeconds(-x),
+                JsonbValue = new List<JsontTest> { { new JsontTest { Decimal2 = 2, Test = "test" } } }
+                /*
+                UuidValue = Guid.NewGuid(),
+                JsonValue = $"{{\"key\": \"value {x}\"}}",
+                JsonbValue = $"{{\"key\": \"value {x}\"}}",
+                ByteaValue = BitConverter.GetBytes(x)*/
             }).ToList();
         }
 
-        [Fact]
-        public async Task Test1()
+       /* public class JsonConvertTypeHandler : INpgsqlTypeConverter
         {
-            DapperPlusManager
-                .Entity<AllFieldTypesWithIdentityTests>()
-                .Table(nameof(AllFieldTypesWithIdentityTests))
-                .Identity(x => x.Id, true);
-
-            var list = Generate(1000);
-            var list2 = Generate(1000);
-            CreateAllFieldsTable(nameof(AllFieldTypesWithIdentityTests));
-
-            var stopwatch = Stopwatch.StartNew(); 
-            using var connection = new NpgsqlConnection(ConnectionString);
-            connection.Open();
-            await connection.BulkInsertOrUpdateAsync(list, nameof(AllFieldTypesWithIdentityTests), excludeProperties: new[] { "DecimalValue" } );
-
-            var elapsed = stopwatch.Elapsed;
-            stopwatch.Restart();
-
-            await connection.BulkInsertOrUpdateAsync(list, nameof(AllFieldTypesWithIdentityTests), excludeProperties: new[] { "DecimalValue" });
-            elapsed = stopwatch.Elapsed;
-            ;
-            stopwatch.Restart();
-            using var c = new NpgsqlConnection(ConnectionString);
-            c.Open();
-            await (c as IDbConnection).BulkMergeAsync(list2); 
-            elapsed = stopwatch.Elapsed;
-            ;
+            public (object Value, NpgsqlDbType? Type) Convert(string columnName, Member member, object value)
+            {
+                return (JsonConvert.SerializeObject(value), NpgsqlDbType.Jsonb);
+            }
+        }*/
+        public class CommonJsonConvertTypeHandler : ITypeConverter
+        {
+            public object Convert(object value)
+            {
+                return JsonConvert.SerializeObject(value);
+            }
         }
-
         [Fact]
         public async Task Test2()
         {
-            var list = Generate(10_000_000);
-            CreateAllFieldsTable(nameof(AllFieldTypesWithIdentityTests));
+            try
+            {
+                TypeConverters.RegisterTypeConverter(typeof(List<JsontTest>), new CommonJsonConvertTypeHandler());
+                var list = Generate(1000);
+                CreateAllFieldsTable(nameof(AllFieldTypesWithIdentityTests));
 
-            var stopwatch = Stopwatch.StartNew(); 
-            using var connection = new NpgsqlConnection(ConnectionString);
-            connection.Open();
-            await connection.BulkInsertAsync(list);
-            //await (connection as IDbConnection).BulkInsertAsync(list);
+                var stopwatch = Stopwatch.StartNew();
+                using var connection = new NpgsqlConnection(ConnectionString);
+                connection.Open();
+                await connection.BulkInsertAsync(list);
+                //await (connection as IDbConnection).BulkInsertAsync(list);
 
-            var elapsed = stopwatch.Elapsed;
-            ;
+                var elapsed = stopwatch.Elapsed;
+                ;
+            }
+            catch (Exception e)
+            {
+                ;
+            }
+            
         }
 
         [Theory]
@@ -83,12 +97,7 @@ namespace Dapper.FastBulkOperations.PostgreSql.Tests
                 {
                     items.Add(new AllFieldTypesWithIdentityTests
                     {
-                        GuidValue = Guid.NewGuid(),
-                        BigTextValue = BigText,
-                        CreateDate = DateTime,
                         DecimalValue = i,
-                        NvarcharValue = $"Test {i}",
-                        EnumValue = EnumValue.Second,
                         IntValue = i
                     });
                 }

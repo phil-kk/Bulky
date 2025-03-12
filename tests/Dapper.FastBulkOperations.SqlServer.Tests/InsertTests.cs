@@ -1,9 +1,9 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
-using Dapper.FastBulkOperations.SqlServer;
+using Bulky.SqlServer;
 using Xunit;
 
-namespace Dapper.FastBulkOperations.SqlServer.Tests;
+namespace Bulky.SqlServer.Tests;
 
 public class InsertTests : SqlServerTestsBase
 {

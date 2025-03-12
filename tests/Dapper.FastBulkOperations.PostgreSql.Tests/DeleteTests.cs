@@ -1,6 +1,8 @@
+using Bulky.PostgreSql;
+using Dapper;
 using Npgsql;
 
-namespace Dapper.FastBulkOperations.PostgreSql.Tests;
+namespace Bulky.PostgreSql.Tests;
 
 public class DeleteTests : PgSqlTestsBase
 {
@@ -15,22 +17,12 @@ public class DeleteTests : PgSqlTestsBase
             CreateAllFieldsTable(tableName);
             var id1 = InsertAllFields(tableName,new  AllFieldTypesWithIdentityTests
             {
-                GuidValue = Guid.NewGuid(),
-                BigTextValue = "BigText1",
-                CreateDate = DateTime.Now,
                 DecimalValue = -1,
-                NvarcharValue = $"NotTest -1",
-                EnumValue = EnumValue.First,
                 IntValue = -1
             });
             var id2 = InsertAllFields(tableName, new AllFieldTypesWithIdentityTests
             {
-                GuidValue = Guid.NewGuid(),
-                BigTextValue = "BigText1",
-                CreateDate = DateTime.Now,
                 DecimalValue = -2,
-                NvarcharValue = $"NotTest -1",
-                EnumValue = EnumValue.Third,
                 IntValue = -2
             });
             var items = new List<AllFieldTypesWithIdentityTests>

@@ -1,6 +1,6 @@
 using MySqlConnector;
 
-namespace Dapper.FastBulkOperations.MySql.Tests;
+namespace Bulky.MySql.Tests;
 
 public class UpdateTests : MySqlTestsBase
 {

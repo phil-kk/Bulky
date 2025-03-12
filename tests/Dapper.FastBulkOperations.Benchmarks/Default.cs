@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Dapper.FastBulkOperations.PostgreSql;
+using Bulky.PostgreSql;
 using Z.Dapper.Plus;
 using Z.Dapper;
 using PostgreSQL.Bulk;
 using System.Data;
-namespace Dapper.FastBulkOperations.Benchmarks;
+namespace Bulky.Benchmarks;
 
 public class AllFieldTypesWithIdentityTests
 {
