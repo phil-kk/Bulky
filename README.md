@@ -10,16 +10,14 @@ Simple usage :
 ```csharp
 const string connectionString = "Server=localhost,1433;Database=master;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;";
 
-TypeConverters.RegisterTypeConverter(typeof(JsonObj), Newtonsoft.Json.JsonConvert.SerializeObject);
-
 var people = new List<Person> { 
-    new Person { FullName = "A B", JsonObj = new JsonObj { JsonProp = "test" } }, 
-    new Person { FullName = "C D", JsonObj = new JsonObj { JsonProp = "test2" } },
-    new Person { IdentityId = 3, FullName = "F E", JsonObj = new JsonObj { JsonProp = "test3" } }
+    new Person { FullName = "A B" }, 
+    new Person { FullName = "C D" },
+    new Person { Id = 3, FullName = "F E" }
 };
 
 await using var sqlConnection = new SqlConnection(connectionString); // MysqlConenction or NpgsqlConnection
-sqlConnection.BulkInsertOrUpdate(people, tableName:"Person");
+sqlConnection.BulkInsertOrUpdate(people);
 
 
 foreach (var person in people)
@@ -28,16 +26,11 @@ foreach (var person in people)
 }
 public class Person
 {
-    public int IdentityId { get; set; }
+    public int Id { get; set; }
 
     public string FullName { get; set; }
+}
 
-    public JsonObj JsonObj { get; set; }
-}
-public class JsonObj
-{
-    public string JsonProp { get; set; }
-}
 ```
 Please check samples folder
 
