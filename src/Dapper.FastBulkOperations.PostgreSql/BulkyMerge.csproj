@@ -3,16 +3,16 @@
     <PropertyGroup>
         <LangVersion>10</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Description>Extra Fast bulk Insert / Update / InserOrUpdate / Delete operations for SqlServer, PostgreSQL and MySQL also suports cutoms converters - TypeConverters.RegisterTypeConverter(typeof(JsonObj), (obj) => JsonConvert.SerializeObject(obj));</Description>
-        <RepositoryUrl>https://github.com/phil-kk/Dapper.BulkyMerge</RepositoryUrl>
-        <PackageTags>dapper, npgsql, postgresql, sqlserver, mysql, mrege, dapper bulk,bulkcopy,bulkmerge,insertorupdate,bulkdelete,bulkmerge,bulkinsert,dapper insert,dapper update,dapper delete,dapper merge</PackageTags>
-        <PackageVersion>1.0.0</PackageVersion>
+        <Description>Extra Fast bulk Insert / Update / InserOrUpdate / Delete operations for SqlServer, PostgreSQL and MySQL also supports custom converters - TypeConverters.RegisterTypeConverter(typeof(JsonObj), (obj) =&gt; JsonConvert.SerializeObject(obj));</Description>
+        <RepositoryUrl>https://github.com/phil-kk/BulkyMerge</RepositoryUrl>
+        <PackageTags>dapper; npgsql; postgresql; sqlserver; mysql; merge; dapper bulk; bulkcopy; bulkmerge; insertorupdate; bulkdelete; bulkmerge; bulkinsert; dapper insert; dapper update; dapper delete; dapper merge</PackageTags>
+        <PackageVersion>1.0.3</PackageVersion>
         <Title>BulkyMerge</Title>
         <PackageProjectUrl>https://github.com/phil-kk/BulkyMerge</PackageProjectUrl>
         <PackageLicenseUrl>https://licenses.nuget.org/Apache-2.0</PackageLicenseUrl>
         <license>https://licenses.nuget.org/Apache-2.0</license>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <Authors>Filipp Kleymenov</Authors>
+        <Authors>Phil Kleymenov</Authors>
         <PackageId>BulkyMerge</PackageId>
         <TargetFramework>net8.0</TargetFramework>
     </PropertyGroup>
