@@ -5,7 +5,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Extra Fast bulk Insert / Update / InserOrUpdate / Delete operations for SqlServer, PostgreSQL and MySQL also suports cutoms converters - TypeConverters.RegisterTypeConverter(typeof(JsonObj), (obj) => JsonConvert.SerializeObject(obj));</Description>
         <RepositoryUrl>https://github.com/phil-kk/Dapper.BulkyMerge</RepositoryUrl>
-        <PackageTags>dapper, npgsql, postgresql, mrege, sqlserver, mysql, dapper bulk,bulkcopy,bulkmerge,insertorupdate,bulkdelete,bulkmerge,bulkinsert,dapper insert,dapper update,dapper delete,dapper merge</PackageTags>
+        <PackageTags>dapper, npgsql, postgresql, sqlserver, mysql, mrege, dapper bulk,bulkcopy,bulkmerge,insertorupdate,bulkdelete,bulkmerge,bulkinsert,dapper insert,dapper update,dapper delete,dapper merge</PackageTags>
         <PackageVersion>1.0.0</PackageVersion>
         <Title>BulkyMerge</Title>
         <PackageProjectUrl>https://github.com/phil-kk/BulkyMerge</PackageProjectUrl>
