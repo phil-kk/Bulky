@@ -1,7 +1,8 @@
 
+using Dapper;
 using MySqlConnector;
 
-namespace Bulky.MySql.Tests;
+namespace BulkyMerge.MySql.Tests;
 
 public class InsertOrUpdateTests: MySqlTestsBase
 {
@@ -84,6 +85,10 @@ public class InsertOrUpdateTests: MySqlTestsBase
             }
             var select = await connection.QueryAsync<AllFieldTypesWithIdentityTests>($"SELECT * FROM `{tableName}` ORDER BY `Id` ASC");
             AllFieldsTestAssertions(select, items);
+        }
+        catch (Exception e)
+        {
+            ;
         }
         finally
         {

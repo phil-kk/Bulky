@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Bulky.Root;
+using BulkyMerge.Root;
 using Microsoft.Data.SqlClient;
 
-namespace Bulky.SqlServer;
+namespace BulkyMerge.SqlServer;
 
 public static partial class SqlServerBulkExtensions
 {

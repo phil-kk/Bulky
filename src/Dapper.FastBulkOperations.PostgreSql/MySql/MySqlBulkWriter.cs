@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Bulky.Root;
+using BulkyMerge.Root;
 using FastMember;
 using MySqlConnector;
 
-namespace Bulky.MySql;
+namespace BulkyMerge.MySql;
 
 public sealed class MySqlBulkWriter : IBulkWriter
 {

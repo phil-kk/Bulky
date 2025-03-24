@@ -1,8 +1,8 @@
-using Bulky.PostgreSql;
+using BulkyMerge.PostgreSql;
 using Dapper;
 using Npgsql;
 
-namespace Bulky.PostgreSql.Tests;
+namespace BulkyMerge.PostgreSql.Tests;
 
 public class DeleteTests : PgSqlTestsBase
 {

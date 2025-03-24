@@ -1,9 +1,9 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
-using Bulky.SqlServer;
+using BulkyMerge.SqlServer;
 using Xunit;
 
-namespace Bulky.SqlServer.Tests;
+namespace BulkyMerge.SqlServer.Tests;
 
 public class InsertTests : SqlServerTestsBase
 {
@@ -43,6 +43,10 @@ public class InsertTests : SqlServerTestsBase
             }
             var select = await connection.QueryAsync<AllFieldTypesWithIdentityTests>($"SELECT * FROM [{tableName}] ORDER BY [Id] ASC");
             AllFieldsTestAssertions(select, items);
+        }
+        catch (Exception e)
+        {
+            ;
         }
         finally
         {

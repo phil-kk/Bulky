@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace Bulky.SqlServer.Tests;
+namespace BulkyMerge.SqlServer.Tests;
 
 public class  AllFieldTypesWithIdentityTests
 {
@@ -54,8 +55,8 @@ public class SqlServerTestsBase
 {
 	protected readonly string BigText = string.Join(string.Empty, Enumerable.Range(0, 1000).Select(x => x.ToString()));
 	protected readonly DateTime DateTime = new DateTime(2022, 1, 1);
-	protected readonly string XmlValue = "<root><text>test</text></root>";
-    protected static string ConnectionString = "Server=localhost;Database=tempdb;Trusted_Connection=True;TrustServerCertificate=true;";
+	protected readonly string XmlValue = "<root><text>test</text></root>"; 
+	protected static string ConnectionString = "Server=localhost,1433;Database=master;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;";
 
     protected void DropTable(string name)
     {
@@ -69,7 +70,7 @@ public class SqlServerTestsBase
 	    using var connection = new SqlConnection(ConnectionString);
 	    {
 		    connection.Open();
-		    connection.Execute(
+            connection.Execute(
 			    $@"{GetDropTableQuery(name)}
                 CREATE TABLE {name}
                 (

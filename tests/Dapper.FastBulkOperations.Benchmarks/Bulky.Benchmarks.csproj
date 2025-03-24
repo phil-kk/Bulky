@@ -33,8 +33,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\Dapper.FastBulkOperations.PostgreSql\Bulky.csproj" />
-      <ProjectReference Include="..\..\src\FastBulkOperations.Root\Dapper.Bulky.Root.csproj" />
+      <ProjectReference Include="..\..\src\Dapper.FastBulkOperations.PostgreSql\BulkyMerge.csproj" />
+      <ProjectReference Include="..\..\src\FastBulkOperations.Root\Dapper.BulkyMerge.Root.csproj" />
     </ItemGroup>
 
 </Project>

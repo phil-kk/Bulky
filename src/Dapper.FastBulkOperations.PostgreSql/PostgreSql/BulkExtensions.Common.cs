@@ -1,6 +1,6 @@
-using Bulky.PostgreSql.PostgreSql;
+using BulkyMerge.PostgreSql.PostgreSql;
 
-namespace Bulky.PostgreSql;
+namespace BulkyMerge.PostgreSql;
 
 public static partial class NpgsqlBulkExtensions
 {

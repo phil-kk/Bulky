@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Dapper;
 using Npgsql;
 
-namespace Bulky.PostgreSql.Tests;
+namespace BulkyMerge.PostgreSql.Tests;
 
 public class  AllFieldTypesWithIdentityTests
 {

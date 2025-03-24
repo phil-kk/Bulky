@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using Bulky.Root;
+using BulkyMerge.Root;
 using Npgsql;
 
-namespace Bulky.PostgreSql.PostgreSql;
+namespace BulkyMerge.PostgreSql.PostgreSql;
 
 
 public class BulkWriterContext

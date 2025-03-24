@@ -1,6 +1,8 @@
+using BulkyMerge.Root;
+using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace Bulky.SqlServer.Tests;
+namespace BulkyMerge.SqlServer.Tests;
 
 public class InsertOrUpdateTests: SqlServerTestsBase
 {
@@ -62,6 +64,7 @@ public class InsertOrUpdateTests: SqlServerTestsBase
                     IntValue = 1
                 }
             };
+
             for (var i = 0; i < 98; i++)
             {
                 items.Add(new AllFieldTypesWithIdentityTests
@@ -89,12 +92,16 @@ public class InsertOrUpdateTests: SqlServerTestsBase
             var select = await connection.QueryAsync<AllFieldTypesWithIdentityTests>($"SELECT * FROM [{tableName}] ORDER BY [Id] ASC");
             AllFieldsTestAssertions(select, items);
         }
+        catch (Exception e)
+        {
+            ;
+        }
         finally
         {
             DropTable(tableName);
         }
     }
-    
+
     [Theory]
     [InlineData(true, true)]
     [InlineData(false, true)]

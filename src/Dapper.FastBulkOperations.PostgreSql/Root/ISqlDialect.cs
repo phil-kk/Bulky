@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 
-namespace Bulky.Root;
+namespace BulkyMerge.Root;
 
 public record BulkWriteContext(
     string TableName,

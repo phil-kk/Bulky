@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using FastMember;
 using Microsoft.Data.SqlClient;
-using Bulky.Root;
+using BulkyMerge.Root;
 
-namespace Bulky.SqlServer;
+namespace BulkyMerge.SqlServer;
 
 
 public class SqlServerBulkWriter : IBulkWriter

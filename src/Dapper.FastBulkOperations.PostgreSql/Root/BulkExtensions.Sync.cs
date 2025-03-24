@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using FastMember;
 
-namespace Bulky.Root;
+namespace BulkyMerge.Root;
 
 public static partial class BulkExtensions
 {

@@ -1,9 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
+using Dapper;
 using MySqlConnector;
 
-namespace Bulky.MySql.Tests;
+namespace BulkyMerge.MySql.Tests;
 
 public class MySqlGuidTypeHandler : SqlMapper.TypeHandler<Guid>
 {
@@ -75,7 +76,7 @@ public class MySqlTestsBase
 	protected readonly string BigText = string.Join(string.Empty, Enumerable.Range(0, 1000).Select(x => x.ToString()));
 	protected readonly DateTime DateTime = new DateTime(2022, 1, 1);
 	protected readonly string XmlValue = "<root><text>test</text></root>";
-    protected static readonly string ConnectionString = "Server=localhost;Database=tempdb;Uid=root;Pwd=1;Port=13306;AllowLoadLocalInfile=true;Allow User Variables=true";
+    protected static readonly string ConnectionString = "Server=localhost;Database=test;Uid=root;Pwd=YourPassword;Port=3306;AllowLoadLocalInfile=true;Allow User Variables=true";
 
     protected void DropTable(string name)
     {

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FastMember;
 
-namespace Bulky.Root;
+namespace BulkyMerge.Root;
 
 public static partial class BulkExtensions
 {

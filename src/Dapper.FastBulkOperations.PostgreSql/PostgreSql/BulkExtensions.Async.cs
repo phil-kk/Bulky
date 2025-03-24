@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using System.Threading.Tasks;
-using Bulky.Root;
+using BulkyMerge.Root;
 using FastMember;
 using Npgsql;
 
-namespace Bulky.PostgreSql;
+namespace BulkyMerge.PostgreSql;
 
 public static partial class NpgsqlBulkExtensions
 {

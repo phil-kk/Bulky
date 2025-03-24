@@ -1,11 +1,11 @@
-using Bulky.Root;
+using BulkyMerge.Root;
 using Microsoft.Data.SqlClient;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
 
-namespace Bulky.SqlServer;
+namespace BulkyMerge.SqlServer;
 
 public sealed class SqlServerDialect : ISqlDialect
 {

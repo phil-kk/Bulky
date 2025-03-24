@@ -5,12 +5,12 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Xml.Linq;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using Bulky.PostgreSql;
+using BulkyMerge.PostgreSql;
 using Z.Dapper.Plus;
 using Z.Dapper;
 using PostgreSQL.Bulk;
 using System.Data;
-namespace Bulky.Benchmarks;
+namespace BulkyMerge.Benchmarks;
 
 public class AllFieldTypesWithIdentityTests
 {
@@ -103,7 +103,7 @@ public class Default
     }
 
     [Benchmark]
-    public async Task Bulky()
+    public async Task BulkyMerge()
     {
         using var connection = new NpgsqlConnection(ConnectionString);
         connection.Open();

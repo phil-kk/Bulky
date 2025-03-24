@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using Bulky.Root;
+using BulkyMerge.Root;
 using MySqlConnector;
 
-namespace Bulky.MySql;
+namespace BulkyMerge.MySql;
 
 internal static class WithLoveToMySqlExtensions
 {

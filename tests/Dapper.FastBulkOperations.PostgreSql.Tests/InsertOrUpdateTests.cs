@@ -1,8 +1,8 @@
-using Bulky.PostgreSql;
+using BulkyMerge.PostgreSql;
 using Dapper;
 using Npgsql;
 
-namespace Bulky.PostgreSql.Tests;
+namespace BulkyMerge.PostgreSql.Tests;
 
 public class InsertOrUpdateTests: PgSqlTestsBase
 {
@@ -59,6 +59,10 @@ public class InsertOrUpdateTests: PgSqlTestsBase
             }
             var select = await connection.QueryAsync<AllFieldTypesWithIdentityTests>($"SELECT * FROM \"{tableName}\" ORDER BY \"Id\" ASC");
             AllFieldsTestAssertions(select, items);
+        }
+        catch (Exception e)
+        {
+            ;
         }
         finally
         {

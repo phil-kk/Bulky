@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Threading.Tasks;
 using FastMember;
 
-namespace Bulky.Root;
+namespace BulkyMerge.Root;
 
 public interface IBulkWriter
 {

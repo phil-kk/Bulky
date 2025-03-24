@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using Bulky.Root;
+using BulkyMerge.Root;
 using Dapper;
 using FastMember;
 using Npgsql;
 
-namespace Bulky.PostgreSql;
+namespace BulkyMerge.PostgreSql;
 
 public static partial class NpgsqlBulkExtensions
 {

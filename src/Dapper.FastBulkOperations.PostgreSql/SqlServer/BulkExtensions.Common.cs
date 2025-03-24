@@ -1,4 +1,4 @@
-namespace Bulky.SqlServer;
+namespace BulkyMerge.SqlServer;
 
 public static partial class SqlServerBulkExtensions
 {

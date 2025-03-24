@@ -5,12 +5,12 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Bulky.Root;
+using BulkyMerge.Root;
 using FastMember;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace Bulky.PostgreSql.PostgreSql;
+namespace BulkyMerge.PostgreSql.PostgreSql;
 
 public sealed class NpgsqlBulkWriter : IBulkWriter
 {

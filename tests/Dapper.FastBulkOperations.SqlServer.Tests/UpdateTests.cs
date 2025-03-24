@@ -1,6 +1,7 @@
+using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace Bulky.SqlServer.Tests;
+namespace BulkyMerge.SqlServer.Tests;
 
 public class UpdateTests : SqlServerTestsBase
 {

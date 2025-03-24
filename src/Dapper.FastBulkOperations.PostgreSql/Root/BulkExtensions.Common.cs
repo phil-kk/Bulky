@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading;
 using FastMember;
 
-namespace Bulky.Root;
+namespace BulkyMerge.Root;
 
 public static partial class BulkExtensions
 {

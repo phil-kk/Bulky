@@ -1,4 +1,4 @@
-namespace Bulky.MySql;
+namespace BulkyMerge.MySql;
 
 public static partial class MySqlBulkExtensions
 {

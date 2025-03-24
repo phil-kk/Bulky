@@ -5,11 +5,25 @@ using System.Reflection;
 using Dapper;
 using FastMember;
 
-namespace Bulky.Root;
+namespace BulkyMerge.Root;
 
 public interface ITypeConverter
 {
     object Convert(object value);
+}
+
+public class DynamicTypeConvert : ITypeConverter
+{
+    private readonly Func<object, object> _callback;
+    public DynamicTypeConvert(Func<object, object> callback)
+    {
+        _callback = callback;
+    }
+
+    public object Convert(object value)
+    {
+        return _callback(value);
+    }
 }
 
 public static class TypeConverters
@@ -18,6 +32,10 @@ public static class TypeConverters
     public static void RegisterTypeConverter(Type type, ITypeConverter converter)
     {
         converters[type] = converter;
+    }
+    public static void RegisterTypeConverter(Type type,Func<object, object> func)
+    {
+        converters[type] = new DynamicTypeConvert(func);
     }
 
     internal static ITypeConverter GetConverter(Type type) => converters.TryGetValue(type, out var converter) ? converter : null;

@@ -1,6 +1,7 @@
+using Dapper;
 using MySqlConnector;
 
-namespace Bulky.MySql.Tests;
+namespace BulkyMerge.MySql.Tests;
 
 public class UpdateTests : MySqlTestsBase
 {

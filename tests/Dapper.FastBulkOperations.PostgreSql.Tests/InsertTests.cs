@@ -1,6 +1,5 @@
-using Bulky.PostgreSql;
-using Bulky.PostgreSql.PostgreSql;
-using Bulky.Root;
+using BulkyMerge.PostgreSql;
+using BulkyMerge.Root;
 using Dapper;
 using FastMember;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -11,7 +10,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-namespace Bulky.PostgreSql.Tests
+namespace BulkyMerge.PostgreSql.Tests
 {
     public class InsertTests : PgSqlTestsBase
     {

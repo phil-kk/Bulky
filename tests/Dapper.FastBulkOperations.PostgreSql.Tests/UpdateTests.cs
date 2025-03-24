@@ -1,8 +1,8 @@
 using Dapper;
 using Npgsql;
-using Bulky;
-using Bulky.PostgreSql;
-namespace Bulky.PostgreSql.Tests;
+using BulkyMerge;
+using BulkyMerge.PostgreSql;
+namespace BulkyMerge.PostgreSql.Tests;
 
 public class UpdateTests : PgSqlTestsBase
 {

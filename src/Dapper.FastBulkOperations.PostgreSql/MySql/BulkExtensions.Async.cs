@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Bulky.Root;
+using BulkyMerge.Root;
 using MySqlConnector;
 
-namespace Bulky.MySql;
+namespace BulkyMerge.MySql;
 
 public static partial class MySqlBulkExtensions
 {
