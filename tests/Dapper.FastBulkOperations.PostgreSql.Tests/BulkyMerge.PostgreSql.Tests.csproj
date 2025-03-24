@@ -9,7 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BulkyMergeDB" Version="1.0.0" />
         <PackageReference Include="Dapper" Version="2.1.66" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
         <PackageReference Include="Npgsql" Version="9.0.3" />
