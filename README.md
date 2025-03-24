@@ -17,14 +17,14 @@ const string connectionString = "Server=localhost;Database=tempdb;Trusted_Connec
 await using var create = new SqlConnection(connectionString);
 {
     create.Execute($"IF OBJECT_ID('Person', 'U') IS NOT NULL DROP TABLE [Person]");
-    create.Execute("CREATE TABLE [Person] ([IdentityId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, [FullName] NVARCHAR(255) NOT NULL)");
+    create.Execute("CREATE TABLE [Person] ([IdentityId] INT NOT NULL IDENTITY(1,1) PRIMARY KEY, [FullName] NVARCHAR(255) NOT NULL, [JsonObj] NVARCHAR(MAX) NOT NULL)");
 }
 
+TypeConverters.RegisterTypeConverter(typeof(JsonObj), (obj) => JsonConvert.SerializeObject(obj));
 
+var people = new List<Person> { new Person { FullName = "A B", JsonObj = new JsonObj { JsonProp = "test"}}, new Person { FullName = "C D", JsonObj = new JsonObj { JsonProp = "test2"}}};
 
-var people = new List<Person> { new Person { FullName = "A B"}, new Person { FullName = "C D"}};
-
-await using var sqlConnection = new SqlConnection(connectionString);
+await using var sqlConnection = new SqlConnection(connectionString); // MysqlConenction or NpgsqlConnection
 sqlConnection.BulkInsert(people);
 
 foreach (var person in people)
@@ -37,7 +37,15 @@ public class Person
     public int IdentityId { get; set; }
     
     public string FullName { get; set; }
+
+    public JsonObj JsonObj { get; set; }
 }
+
+public class JsonObj
+{
+        public string JsonProp { get; set; }
+}
+
 ```
 Please check samples folder
 
