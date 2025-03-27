@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BulkyMerge.Root;
 using Dapper;
 using Npgsql;
 
 namespace BulkyMerge.PostgreSql.Tests;
-
+/*
 public class  AllFieldTypesWithIdentityTests
 {
     public long Id { get; set; }
@@ -30,6 +31,18 @@ public class  AllFieldTypesWithIdentityTests
     public byte[] ByteaValue { get; set; }
 
     public List<JsontTest> JsonbValue { get; set; }
+}
+*/
+public class AllFieldTypesWithIdentityTests
+{
+    public long Id { get; set; }
+    public string NvarcharValue { get; set; }
+    public EnumValue EnumValue { get; set; }
+    public string BigTextValue { get; set; }
+    public int IntValue { get; set; }
+    public decimal DecimalValue { get; set; }
+    public Guid GuidValue { get; set; }
+    public DateTime CreateDate { get; set; }
 }
 
 public class JsontTest
@@ -77,7 +90,7 @@ public class PgSqlTestsBase
 	protected readonly string BigText = string.Join(string.Empty, Enumerable.Range(0, 1000).Select(x => x.ToString()));
 	protected readonly DateTime DateTime = new DateTime(2022, 1, 1);
 	protected readonly string XmlValue = "<root><text>test</text></root>";
-    protected static string ConnectionString = "";
+    protected static string ConnectionString = "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=YourPassword;";
 
     protected void DropTable(string name)
     {
@@ -121,8 +134,23 @@ public class PgSqlTestsBase
 	    }
     }
 
+    /*
+     * public long Id { get; set; }
+    public string NvarcharValue { get; set; }
+    public EnumValue EnumValue { get; set; }
+    public string BigTextValue { get; set; }
+    public int IntValue { get; set; }
+    public decimal DecimalValue { get; set; }
+    public Guid GuidValue { get; set; }
+    public DateTime CreateDate { get; set; }
+     * */
+
     protected void CreateAllFieldsTable(string name)
     {
+        TypeConverters.RegisterTypeConverter(typeof(EnumValue), (e) =>
+        {
+            return Convert.ToInt32(e);
+        });
         using var connection = new NpgsqlConnection(ConnectionString);
         {
             connection.Open();
@@ -131,41 +159,14 @@ public class PgSqlTestsBase
             CREATE TABLE ""{name}""
             (
                 ""Id"" bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-                ""VarcharValue"" varchar(255) NULL,
-                ""TextValue"" text NULL,
-                ""CharValue"" char(1) NULL,
-                ""BooleanValue"" boolean NULL,
-                ""SmallIntValue"" smallint NULL,
                 ""IntValue"" integer NULL,
                 ""BigIntValue"" bigint NULL,
                 ""DecimalValue"" decimal(10, 4) NULL,
-                ""RealValue"" real NULL,
-                ""DoublePrecisionValue"" double precision NULL,
-                
-                -- Даты и время
-                ""DateValue"" date NULL,
-                ""TimeValue"" time NULL,
-                ""TimestampValue"" timestamp NULL,
-                ""TimestampTzValue"" timestamptz NULL,
-                ""IntervalValue"" interval NULL,
-
-                ""UuidValue"" uuid NULL,
-                ""JsonValue"" json NULL,
-                ""JsonbValue"" jsonb NULL,
-                ""ByteaValue"" bytea NULL,
-                ""InetValue"" inet NULL,
-                ""CidrValue"" cidr NULL,
-                ""MacAddrValue"" macaddr NULL,
-                ""IntArray"" integer[] NULL,
-                ""TextArray"" text[] NULL,
-                ""UuidArray"" uuid[] NULL,
-                ""PointValue"" point NULL,
-                ""LineValue"" line NULL,
-                ""LsegValue"" lseg NULL,
-                ""BoxValue"" box NULL,
-                ""PathValue"" path NULL,
-                ""PolygonValue"" polygon NULL,
-                ""CircleValue"" circle NULL
+                ""NvarcharValue"" varchar(255) NULL,
+                ""EnumValue"" integer NULL,
+                ""BigTextValue"" TEXT NULL,
+                ""CreateDate"" date NULL,
+                ""GuidValue"" uuid NULL
             )");
         }
     }

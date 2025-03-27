@@ -12,7 +12,7 @@ using NpgsqlTypes;
 
 namespace BulkyMerge.PostgreSql.PostgreSql;
 
-public sealed class NpgsqlBulkWriter : IBulkWriter
+internal sealed class NpgsqlBulkWriter : IBulkWriter
 {
     private static readonly ConcurrentDictionary<Type, object> enumCache = new();
 
@@ -38,9 +38,9 @@ public sealed class NpgsqlBulkWriter : IBulkWriter
                 }
             }
         }
-        catch 
+        catch (Exception e)
         {
-
+            ;
         }
         return columns;
     }
@@ -66,25 +66,24 @@ public sealed class NpgsqlBulkWriter : IBulkWriter
     }
 
 
-    public void Write<T>(DbConnection connection, DbTransaction transaction, int timeout, int batchSize, IEnumerable<T> items,
-        IEnumerable<KeyValuePair<string, Member>> mapping, string tableName)
+    public void Write<T>(string destination, MergeContext<T> context)
     {
-        var columnTypes = GetColumns(connection, tableName);
-        var columnsMapping = new List<KeyValuePair<string, Member>>(mapping);
+        var columnTypes = GetColumns(context.Connection, context.TableName);
+        var columnsMapping = new List<KeyValuePair<string, Member>>(context.ColumnsToProperty);
         var columns = columnsMapping.Select(x => x.Key);
         var columnsString = string.Join(",", columns.Select(x => $"\"{x}\""));
         var accessor = TypeAccessor.Create(typeof(T));
-        using var writer = (connection as NpgsqlConnection)?.BeginBinaryImport($"COPY \"{tableName}\" ({columnsString}) FROM STDIN (FORMAT BINARY)");
+        using var writer = (context.Connection as NpgsqlConnection)?.BeginBinaryImport($"COPY \"{destination}\" ({columnsString}) FROM STDIN (FORMAT BINARY)");
         writer.Timeout = TimeSpan.FromDays(1);
         var row = new object[columnsMapping.Count];
-        foreach (var item in items)
+        foreach (var item in context.Items)
         {
             writer.StartRow();
             foreach (var columnMapping in columnsMapping)
             {
                 var commonConverter = TypeConverters.GetConverter(columnMapping.Value.Type);
                 var value = accessor[item, columnMapping.Value.Name];
-                var type = columnTypes.TryGetValue(columnMapping.Value.Name.ToLower(), out var columnType) ? columnType : null;
+                var type = columnTypes.TryGetValue(columnMapping.Key.ToLower(), out var columnType) ? columnType : null;
                 if (commonConverter != null)
                 {
                     value = commonConverter.Convert(value);
@@ -106,18 +105,17 @@ public sealed class NpgsqlBulkWriter : IBulkWriter
         writer.Complete();
     }
 
-    public async Task WriteAsync<T>(DbConnection connection, DbTransaction transaction, int timeout, int batchSize, IEnumerable<T> items,
-        IEnumerable<KeyValuePair<string, Member>> mapping, string tableName)
+    public async Task WriteAsync<T>(string destination, MergeContext<T> context)
     {
-        var columnTypes = GetColumns(connection, tableName);
-        var columnsMapping = new List<KeyValuePair<string, Member>>(mapping);
+        var columnTypes = GetColumns(context.Connection, context.TableName);
+        var columnsMapping = new List<KeyValuePair<string, Member>>(context.ColumnsToProperty);
         var columns = columnsMapping.Select(x => x.Key);
         var columnsString = string.Join(",", columns.Select(x => $"\"{x}\""));
         var accessor = TypeAccessor.Create(typeof(T));
-        await using var writer = await (connection as NpgsqlConnection)?.BeginBinaryImportAsync($"COPY \"{tableName}\" ({columnsString}) FROM STDIN (FORMAT BINARY)");
+        await using var writer = await (context.Connection as NpgsqlConnection)?.BeginBinaryImportAsync($"COPY \"{destination}\" ({columnsString}) FROM STDIN (FORMAT BINARY)");
         writer.Timeout = TimeSpan.FromDays(1);
         var row = new object[columnsMapping.Count];
-        foreach (var item in items)
+        foreach (var item in context.Items)
         {
             var vals = new List<(object Value, NpgsqlDbType? Type)>();
             await writer.StartRowAsync();
@@ -125,7 +123,7 @@ public sealed class NpgsqlBulkWriter : IBulkWriter
             {
                 var commonConverter = TypeConverters.GetConverter(columnMapping.Value.Type);
                 var value = accessor[item, columnMapping.Value.Name];
-                var type = columnTypes.TryGetValue(columnMapping.Value.Name.ToLower(), out var columnType) ? columnType : null;
+                var type = columnTypes.TryGetValue(columnMapping.Key.ToLower(), out var columnType) ? columnType : null;
                 if (commonConverter != null)
                 {
                     value = commonConverter.Convert(value);

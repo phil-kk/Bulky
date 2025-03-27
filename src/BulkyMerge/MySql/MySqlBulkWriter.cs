@@ -8,7 +8,7 @@ using MySqlConnector;
 
 namespace BulkyMerge.MySql;
 
-public sealed class MySqlBulkWriter : IBulkWriter
+internal sealed class MySqlBulkWriter : IBulkWriter
 {
     private readonly ISqlDialect _dialect;
 
@@ -30,40 +30,38 @@ public sealed class MySqlBulkWriter : IBulkWriter
         cmd.CommandText = "SET GLOBAL local_infile = true;";
         await cmd.ExecuteNonQueryAsync();
     }
-    public void Write<T>(DbConnection connection, DbTransaction transaction, int timeout, int batchSize, IEnumerable<T> items,
-        IEnumerable<KeyValuePair<string, Member>> mapping, string tableName)
+    public void Write<T>(string destination, MergeContext<T> context)
     {
-        if (connection is not MySqlConnection mySqlConnection) return;
+        if (context.Connection is not MySqlConnection mySqlConnection) return;
         SetLoadInFile(mySqlConnection);
-        var ordered = mapping.OrderBy(x => x.Key).ToArray();
-        var objectReader = items.ToObjectDapperReader(_dialect, ordered.Select(x => x.Value.Name).ToArray());
-        var bulkCopy = new MySqlBulkCopy(mySqlConnection, transaction as MySqlTransaction);
+        var ordered = context.ColumnsToProperty.OrderBy(x => x.Key).ToArray();
+        var objectReader = context.Items.ToObjectDapperReader(_dialect, ordered.Select(x => x.Value.Name).ToArray());
+        var bulkCopy = new MySqlBulkCopy(mySqlConnection, context.Transaction as MySqlTransaction);
         var ordinal = 0;
         foreach (var columnMapping in ordered)
         {
             bulkCopy.ColumnMappings.Add(new MySqlBulkCopyColumnMapping { DestinationColumn = columnMapping.Key, SourceOrdinal = ordinal++ } );
         }
-        bulkCopy.BulkCopyTimeout = timeout;
-        bulkCopy.DestinationTableName = tableName;
+        bulkCopy.BulkCopyTimeout = context.Timeout;
+        bulkCopy.DestinationTableName = destination;
                     
         bulkCopy.WriteToServer(objectReader);
     }
 
-    public async Task WriteAsync<T>(DbConnection connection, DbTransaction transaction, int timeout, int batchSize, IEnumerable<T> items,
-        IEnumerable<KeyValuePair<string, Member>> mapping, string tableName)
+    public async Task WriteAsync<T>(string destination, MergeContext<T> context)
     {
-        if (connection is not MySqlConnection mySqlConnection) return;
+        if (context.Connection is not MySqlConnection mySqlConnection) return;
         await SetLoadInFileAsync(mySqlConnection);
-        var ordered = mapping.OrderBy(x => x.Key).ToArray();
-        var objectReader = items.ToObjectDapperReader(_dialect, ordered.Select(x => x.Value.Name).ToArray());
-        var bulkCopy = new MySqlBulkCopy(mySqlConnection, transaction as MySqlTransaction);
+        var ordered = context.ColumnsToProperty.OrderBy(x => x.Key).ToArray();
+        var objectReader = context.Items.ToObjectDapperReader(_dialect, ordered.Select(x => x.Value.Name).ToArray());
+        var bulkCopy = new MySqlBulkCopy(mySqlConnection, context.Transaction as MySqlTransaction);
         var ordinal = 0;
         foreach (var columnMapping in ordered)
         {
             bulkCopy.ColumnMappings.Add(new MySqlBulkCopyColumnMapping { DestinationColumn = columnMapping.Key, SourceOrdinal = ordinal++ } );
         }
-        bulkCopy.BulkCopyTimeout = timeout;
-        bulkCopy.DestinationTableName = tableName;
+        bulkCopy.BulkCopyTimeout = context.Timeout;
+        bulkCopy.DestinationTableName = destination;
                     
         await bulkCopy.WriteToServerAsync(objectReader);
     }

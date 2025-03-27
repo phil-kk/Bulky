@@ -1,9 +1,6 @@
 using System.Collections.Generic;
-using System.Data;
-using System.Text;
 using System.Threading.Tasks;
 using BulkyMerge.Root;
-using FastMember;
 using Npgsql;
 
 namespace BulkyMerge.PostgreSql;

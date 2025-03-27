@@ -8,20 +8,10 @@ using Npgsql;
 
 namespace BulkyMerge.PostgreSql.PostgreSql;
 
-
-public class BulkWriterContext
-{
-    public string TableName { get; set; }
-    // public
-}
-
-public class ColumnMapping
-{
-    public string Name { get; set; }
-}
-
 public sealed class NpgsqlDialect : ISqlDialect
 {
+    public string DefaultScheme => "public";
+
     public string GetFindPrimaryKeysQuery(string databaseName, string tableName)
         => $@"SELECT       
     pg_attribute.attname
@@ -56,31 +46,31 @@ public sealed class NpgsqlDialect : ISqlDialect
 
     public string GetCreateTempTableQuery(string tempTableName, string destination, IEnumerable<string> columnNames = null) => $"SELECT * INTO TEMP \"{tempTableName}\" FROM \"{destination}\" WHERE 1 = 0;";
 
-    public string GetInsertOrUpdateMergeStatement(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
+    public string GetInsertOrUpdateMergeStatement(IEnumerable<string> columnNames, string tableName, string tempTableName, IEnumerable<string> primaryKeys, Identity identity)
     {
-        var identityExist = bulkWriteContext.Identity is not null;
-        columnNames = identityExist ? columnNames.Where(x => x != bulkWriteContext.Identity.ColumnName) : columnNames;
+        var identityExist = identity is not null;
+        columnNames = identityExist ? columnNames.Where(x => x != identity.ColumnName) : columnNames;
         var merge = new StringBuilder();
         var columnsString = string.Join(',', columnNames.Select(x => $"\"{x}\""));
         var primaryKeysMatchString =
-            string.Join(" AND ", bulkWriteContext.PrimaryKeys.Select(x => $"d.\"{x}\" = s.\"{x}\""));
-        merge.Append($@"WITH ""updated"" AS(UPDATE ""{bulkWriteContext.TableName}"" AS d 
-        SET {string.Join(',', columnNames.Except(bulkWriteContext.PrimaryKeys).Select(x => $"\"{x}\" = s.\"{x}\""))}
-        FROM ""{bulkWriteContext.TempTable}"" AS s
+            string.Join(" AND ", primaryKeys.Select(x => $"d.\"{x}\" = s.\"{x}\""));
+        merge.Append($@"WITH ""updated"" AS(UPDATE ""{tableName}"" AS d 
+        SET {string.Join(',', columnNames.Except(primaryKeys).Select(x => $"\"{x}\" = s.\"{x}\""))}
+        FROM ""{tempTableName}"" AS s
         WHERE {primaryKeysMatchString}
-        RETURNING {string.Join(',', bulkWriteContext.PrimaryKeys.Select(x => $"d.\"{x}\""))}
+        RETURNING {string.Join(',', primaryKeys.Select(x => $"d.\"{x}\""))}
             )
 DELETE 
-FROM ""{bulkWriteContext.TempTable}"" d
+FROM ""{tempTableName}"" d
      USING ""updated"" s WHERE {primaryKeysMatchString};");
-        var insertClause = @$"INSERT INTO ""{bulkWriteContext.TableName}"" ({columnsString})
-        SELECT {columnsString} FROM ""{bulkWriteContext.TempTable}""";
+        var insertClause = @$"INSERT INTO ""{tableName}"" ({columnsString})
+        SELECT {columnsString} FROM ""{tempTableName}""";
         if (identityExist)
         {
             merge.Append(@$"WITH ""inserted"" AS ({insertClause}
-        RETURNING ""{bulkWriteContext.Identity.ColumnName}"")
-                SELECT ""{bulkWriteContext.Identity.ColumnName}"" FROM ""inserted"";
-        DROP TABLE ""{bulkWriteContext.TempTable}""");
+        RETURNING ""{identity.ColumnName}"")
+                SELECT ""{identity.ColumnName}"" FROM ""inserted"";
+        DROP TABLE ""{tempTableName}""");
         }
         else
         {
@@ -94,41 +84,41 @@ FROM ""{bulkWriteContext.TempTable}"" d
         => $@"ALTER TABLE ""{tempTableName}"" DROP COLUMN ""{identity.ColumnName}"";
 ALTER TABLE ""{tempTableName}"" ADD ""{identity.ColumnName}"" {identity.Type}";
 
-    public string GetInsertQuery(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
+    public string GetInsertQuery(IEnumerable<string> columnNames, string tableName, string tempTableName, IEnumerable<string> primaryKeys, Identity identity)
     {
-        var identityExist = bulkWriteContext.Identity is not null;
+        var identityExist = identity is not null;
         var merge = new StringBuilder();
-        var columnsString = string.Join(',', (!identityExist ? columnNames : columnNames.Where(x => x != bulkWriteContext.Identity.ColumnName)).Select(x => $"\"{x}\""));
-        var insertClause = @$"INSERT INTO ""{bulkWriteContext.TableName}"" ({columnsString})
-        SELECT {columnsString} FROM ""{bulkWriteContext.TempTable}""";
+        var columnsString = string.Join(',', (!identityExist ? columnNames : columnNames.Where(x => x != identity.ColumnName)).Select(x => $"\"{x}\""));
+        var insertClause = @$"INSERT INTO ""{tableName}"" ({columnsString})
+        SELECT {columnsString} FROM ""{tempTableName}""";
         if (identityExist)
         {
             merge.Append(@$"WITH ""inserted"" AS ({insertClause}
-        RETURNING ""{bulkWriteContext.Identity.ColumnName}"")
-                SELECT ""{bulkWriteContext.Identity.ColumnName}"" FROM ""inserted"";
-        DROP TABLE ""{bulkWriteContext.TempTable}""");
+        RETURNING ""{identity.ColumnName}"")
+                SELECT ""{identity.ColumnName}"" FROM ""inserted"";
+        DROP TABLE ""{tempTableName}""");
         }
         else
         {
-            merge.Append($"{insertClause};DROP TABLE \"{bulkWriteContext.TempTable}\"");
+            merge.Append($"{insertClause};DROP TABLE \"{tempTableName}\"");
         }
 
         return merge.ToString();
     }
 
-    public string GetUpdateQuery(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
-        => @$"UPDATE ""{bulkWriteContext.TableName}"" AS d 
-        SET {string.Join(',', columnNames.Except(bulkWriteContext.PrimaryKeys).Select(x => $"\"{x}\" = s.\"{x}\""))}
-FROM ""{bulkWriteContext.TempTable}"" AS s
-WHERE {string.Join(" AND ", bulkWriteContext.PrimaryKeys.Select(x => $"d.\"{x}\" = s.\"{x}\""))};
-DROP TABLE ""{bulkWriteContext.TempTable}""";
+    public string GetUpdateQuery(IEnumerable<string> columnNames, string tableName, string tempTableName, IEnumerable<string> primaryKeys, Identity identity)
+        => @$"UPDATE ""{tableName}"" AS d 
+        SET {string.Join(',', columnNames.Except(primaryKeys).Select(x => $"\"{x}\" = s.\"{x}\""))}
+FROM ""{tempTableName}"" AS s
+WHERE {string.Join(" AND ", primaryKeys.Select(x => $"d.\"{x}\" = s.\"{x}\""))};
+DROP TABLE ""{tempTableName}""";
 
-    public string GetDeleteQuery(BulkWriteContext createTempTableResult)
+    public string GetDeleteQuery(string tableName, string tempTableName, IEnumerable<string> primaryKeys, Identity identity)
         => $@"
 DELETE 
-FROM ""{createTempTableResult.TableName}"" s
-     USING ""{createTempTableResult.TempTable}"" t WHERE {string.Join(" AND ", createTempTableResult.PrimaryKeys.Select(x => @$"s.""{x}"" = t.""{x}"""))};
-DROP TABLE ""{createTempTableResult.TempTable}""";
+FROM ""{tableName}"" s
+     USING ""{tempTableName}"" t WHERE {string.Join(" AND ", primaryKeys.Select(x => @$"s.""{x}"" = t.""{x}"""))};
+DROP TABLE ""{tempTableName}""";
 
     public string GetTempTableName(string targetTableName) => $"{targetTableName}_{Guid.NewGuid():N}";
 

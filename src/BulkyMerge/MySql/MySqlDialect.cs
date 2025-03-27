@@ -8,12 +8,10 @@ using MySqlConnector;
 
 namespace BulkyMerge.MySql;
 
-internal static class WithLoveToMySqlExtensions
-{
-    internal static string CutTempTableName(this string tempTableName) => tempTableName.Length >= 63 ? tempTableName[..63] : tempTableName;
-}
 public sealed class MySqlDialect : ISqlDialect
 {
+    public string DefaultScheme => null;
+
     public string GetFindPrimaryKeysQuery(string databaseName, string tableName)
         => $@"SELECT COLUMN_NAME
   FROM INFORMATION_SCHEMA.COLUMNS
@@ -24,80 +22,84 @@ public sealed class MySqlDialect : ISqlDialect
     FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{databaseName}' AND TABLE_NAME = '{tableName}'
     AND EXTRA = 'auto_increment'";
 
-    public string GetCreateTempTableQuery(string tempTableName, string destination, IEnumerable<string> columnNames = null) => $"CREATE TEMPORARY TABLE IF NOT EXISTS `{tempTableName.CutTempTableName()}` AS (SELECT * FROM `{destination}` WHERE 1=0);";
+    public string GetCreateTempTableQuery(string tempTableName, string destination, IEnumerable<string> columnNames = null) => $"CREATE TEMPORARY TABLE IF NOT EXISTS `{tempTableName}` AS (SELECT * FROM `{destination}` WHERE 1=0);";
 
-    public string GetInsertOrUpdateMergeStatement(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
+    public string GetInsertOrUpdateMergeStatement(IEnumerable<string> columnNames, string tableName, string tempTableName, IEnumerable<string> primaryKeys, Identity identity)
     {
-        var identityExist = bulkWriteContext.Identity is not null;
+        var identityExist = identity is not null;
         var merge = new StringBuilder();
         var columnsString = string.Join(',', columnNames.Select(x => $"`{x}`"));
         var primaryKeysMatchString =
-            string.Join(" AND ", bulkWriteContext.PrimaryKeys.Select(x => $"d.`{x}` = s.`{x}`"));
-        var insertOrUpdateClause = @$"INSERT INTO `{bulkWriteContext.TableName}` ({columnsString}) SELECT {columnsString} FROM `{bulkWriteContext.TempTable.CutTempTableName()}`
-        ON DUPLICATE KEY UPDATE {string.Join(',', columnNames.Except(bulkWriteContext.PrimaryKeys).Select(x => $"`{bulkWriteContext.TableName}`.`{x}` = `{bulkWriteContext.TempTable.CutTempTableName()}`.`{x}`"))};";
+            string.Join(" AND ", primaryKeys.Select(x => $"d.`{x}` = s.`{x}`"));
+        var insertOrUpdateClause = @$"INSERT INTO `{tableName}` ({columnsString}) SELECT {columnsString} FROM `{tempTableName}`
+        ON DUPLICATE KEY UPDATE {string.Join(',', columnNames.Except(primaryKeys).Select(x => $"`{tableName}`.`{x}` = `{tempTableName}`.`{x}`"))};";
         if (identityExist)
         {
-            merge.Append($"LOCK TABLES {bulkWriteContext.TempTable} READ, {bulkWriteContext.TableName} WRITE;");
+            merge.Append($"LOCK TABLES {tempTableName} READ, {tableName} WRITE;");
             merge.Append(insertOrUpdateClause);
             merge.Append($@"SET @row_count = ROW_COUNT();
 SET @last_insert_id = LAST_INSERT_ID();
 UNLOCK TABLES;
-SELECT `{bulkWriteContext.Identity.ColumnName}` FROM `{bulkWriteContext.TableName}` WHERE `{bulkWriteContext.Identity.ColumnName}` >= @last_insert_id AND `{bulkWriteContext.Identity.ColumnName}` <= @last_insert_id + (@row_count - 1);
-DROP TABLE `{bulkWriteContext.TempTable.CutTempTableName()}`");
+SELECT `{identity.ColumnName}` FROM `{tableName}` WHERE `{identity.ColumnName}` >= @last_insert_id AND `{identity.ColumnName}` <= @last_insert_id + (@row_count - 1);
+DROP TABLE `{tempTableName}`");
         }
         else
         {
-            merge.Append($"{insertOrUpdateClause}DROP TABLE `{bulkWriteContext.TempTable.CutTempTableName()}`");
+            merge.Append($"{insertOrUpdateClause}DROP TABLE `{tempTableName}`");
         } 
        
         return merge.ToString();
     }
 
     public string GetAlterIdentityColumnQuery(string tempTableName, Identity identity)
-        => $@"ALTER TABLE `{tempTableName.CutTempTableName()}` DROP COLUMN `{identity.ColumnName}`;
-ALTER TABLE `{tempTableName.CutTempTableName()}` ADD `{identity.ColumnName}` {identity.Type}";
+        => $@"ALTER TABLE `{tempTableName}` DROP COLUMN `{identity.ColumnName}`;
+ALTER TABLE `{tempTableName}` ADD `{identity.ColumnName}` {identity.Type}";
 
-    public string GetInsertQuery(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
+    public string GetInsertQuery(IEnumerable<string> columnNames, string tableName, string tempTableName, IEnumerable<string> primaryKeys, Identity identity)
     {
-        var identityExist = bulkWriteContext.Identity is not null;
+        var identityExist = identity is not null;
         var merge = new StringBuilder();
-        var columnsString = string.Join(',', (!identityExist ? columnNames : columnNames.Where(x => x != bulkWriteContext.Identity.ColumnName)).Select(x => $"`{x}`"));
-        var insertClause = @$"INSERT INTO `{bulkWriteContext.TableName}` ({columnsString})
-        SELECT {columnsString} FROM `{bulkWriteContext.TempTable.CutTempTableName()}`;";
+        var columnsString = string.Join(',', (!identityExist ? columnNames : columnNames.Where(x => x != identity.ColumnName)).Select(x => $"`{x}`"));
+        var insertClause = @$"INSERT INTO `{tableName}` ({columnsString})
+        SELECT {columnsString} FROM `{tempTableName}`;";
         if (identityExist)
         {
-            merge.Append($"LOCK TABLES {bulkWriteContext.TempTable} READ, {bulkWriteContext.TableName} WRITE;");
+            merge.Append($"LOCK TABLES {tempTableName} READ, {tableName} WRITE;");
             merge.Append(insertClause);
             merge.Append($@"SET @row_count = ROW_COUNT();
 SET @last_insert_id = LAST_INSERT_ID();
 UNLOCK TABLES;
-SELECT `{bulkWriteContext.Identity.ColumnName}` FROM `{bulkWriteContext.TableName}` WHERE `{bulkWriteContext.Identity.ColumnName}` >= @last_insert_id AND `{bulkWriteContext.Identity.ColumnName}` <= @last_insert_id + (@row_count - 1);
-DROP TABLE `{bulkWriteContext.TempTable.CutTempTableName()}`");
+SELECT `{identity.ColumnName}` FROM `{tableName}` WHERE `{identity.ColumnName}` >= @last_insert_id AND `{identity.ColumnName}` <= @last_insert_id + (@row_count - 1);
+DROP TABLE `{tempTableName}`");
         }
         else
         {
-            merge.Append($"{insertClause}DROP TABLE `{bulkWriteContext.TempTable.CutTempTableName()}`");
+            merge.Append($"{insertClause}DROP TABLE `{tempTableName}`");
         }
 
         return merge.ToString();
     }
 
-    public string GetUpdateQuery(IEnumerable<string> columnNames, BulkWriteContext bulkWriteContext)
+    public string GetUpdateQuery(IEnumerable<string> columnNames, string tableName, string tempTableName, IEnumerable<string> primaryKeys, Identity identity)
     {
         var primaryKeysMatchString =
-            string.Join(" AND ", bulkWriteContext.PrimaryKeys.Select(x => $"`{bulkWriteContext.TableName}`.`{x}` = `{bulkWriteContext.TempTable}`.`{x}`"));
-        return @$"UPDATE `{bulkWriteContext.TableName}` INNER JOIN `{bulkWriteContext.TempTable.CutTempTableName()}`ON ({primaryKeysMatchString})
-        SET {string.Join(',', columnNames.Except(bulkWriteContext.PrimaryKeys).Select(x => $"`{bulkWriteContext.TableName}`.`{x}` = `{bulkWriteContext.TempTable.CutTempTableName()}`.`{x}`"))}
-;DROP TABLE `{bulkWriteContext.TempTable.CutTempTableName()}`";;
+            string.Join(" AND ", primaryKeys.Select(x => $"`{tableName}`.`{x}` = `{tempTableName}`.`{x}`"));
+        return @$"UPDATE `{tableName}` INNER JOIN `{tempTableName}`ON ({primaryKeysMatchString})
+        SET {string.Join(',', columnNames.Except(primaryKeys).Select(x => $"`{tableName}`.`{x}` = `{tempTableName}`.`{x}`"))}
+;DROP TABLE `{tempTableName}`";;
     }
     
-    public string GetDeleteQuery(BulkWriteContext createTempTableResult)
-        => $@"DELETE `{createTempTableResult.TableName}`
-FROM `{createTempTableResult.TableName}`
-INNER JOIN `{createTempTableResult.TempTable.CutTempTableName()}` ON ({string.Join(" AND ", createTempTableResult.PrimaryKeys.Select(x => @$"`{createTempTableResult.TableName}`.`{x}` = `{createTempTableResult.TempTable.CutTempTableName()}`.`{x}`"))});
-DROP TABLE `{createTempTableResult.TempTable.CutTempTableName()}`";
+    public string GetDeleteQuery(string tableName, string tempTableName, IEnumerable<string> primaryKeys, Identity identity)
+        => $@"DELETE `{tableName}`
+FROM `{tableName}`
+INNER JOIN `{tempTableName}` ON ({string.Join(" AND ", primaryKeys.Select(x => @$"`{tableName}`.`{x}` = `{tempTableName}`.`{x}`"))});
+DROP TABLE `{tempTableName}`";
 
-    public string GetTempTableName(string targetTableName) => $"{targetTableName}_{Guid.NewGuid():N}".CutTempTableName();
+    public string GetTempTableName(string targetTableName) 
+    {
+        var tempTableName = $"{targetTableName}_{Guid.NewGuid():N}";
+        return tempTableName.Length >= 63 ? tempTableName[..63] : tempTableName;
+   }
 
     public IDbDataParameter CreateParameter(object value) => new MySqlParameter { Value = value };
 }

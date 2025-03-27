@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <LangVersion>10</LangVersion>
+        <LangVersion>12</LangVersion>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Description>Extra Fast bulk Insert / Update / InserOrUpdate / Delete operations for SqlServer, PostgreSQL and MySQL also supports custom converters - TypeConverters.RegisterTypeConverter(typeof(JsonObj), (obj) =&gt; JsonConvert.SerializeObject(obj));</Description>
         <RepositoryUrl>https://github.com/phil-kk/BulkyMerge</RepositoryUrl>

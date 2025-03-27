@@ -1,15 +1,12 @@
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using FastMember;
 using Microsoft.Data.SqlClient;
 using BulkyMerge.Root;
 
 namespace BulkyMerge.SqlServer;
 
 
-public class SqlServerBulkWriter : IBulkWriter
+internal class SqlServerBulkWriter : IBulkWriter
 {
     private readonly ISqlDialect _dialect;
 
@@ -18,41 +15,34 @@ public class SqlServerBulkWriter : IBulkWriter
         _dialect = dialect;
     }
 
-    public void Write<T>(DbConnection connection, 
-        DbTransaction transaction, 
-        int timeout, 
-        int batchSize, 
-        IEnumerable<T> items,
-        IEnumerable<KeyValuePair<string, Member>> mapping, 
-        string tableName)
+    public void Write<T>(string destination, MergeContext<T> context)
     {
-        var objectReader = items.ToObjectDapperReader(_dialect, mapping.Select(x => x.Value.Name).ToArray());
-        using var microsoftClientBukCopy = new SqlBulkCopy(connection as SqlConnection, SqlBulkCopyOptions.Default, transaction as SqlTransaction);
-        foreach (var columnMapping in mapping)
+        var objectReader = context.Items.ToObjectDapperReader(_dialect, context.ColumnsToProperty.Select(x => x.Value.Name).ToArray());
+        using var microsoftClientBukCopy = new SqlBulkCopy(context.Connection as SqlConnection, SqlBulkCopyOptions.Default, context.Transaction as SqlTransaction);
+        foreach (var columnMapping in context.ColumnsToProperty)
         {
             microsoftClientBukCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(columnMapping.Value.Name, columnMapping.Key));
         }
         microsoftClientBukCopy.EnableStreaming = true;
-        microsoftClientBukCopy.BatchSize = batchSize;
-        microsoftClientBukCopy.BulkCopyTimeout = timeout;
-        microsoftClientBukCopy.DestinationTableName = tableName;
+        microsoftClientBukCopy.BatchSize = context.BatchSize;
+        microsoftClientBukCopy.BulkCopyTimeout = context.Timeout;
+        microsoftClientBukCopy.DestinationTableName = destination;
 
         microsoftClientBukCopy.WriteToServer(objectReader);
     }
 
-    public async Task WriteAsync<T>(DbConnection connection, DbTransaction transaction, int timeout, int batchSize, IEnumerable<T> items,
-        IEnumerable<KeyValuePair<string, Member>> mapping, string tableName)
+    public async Task WriteAsync<T>(string destination, MergeContext<T> context)
     {
-        var objectReader = items.ToObjectDapperReader(_dialect, mapping.Select(x => x.Value.Name).ToArray());
-        using var microsoftClientBukCopy = new SqlBulkCopy(connection as SqlConnection, SqlBulkCopyOptions.Default, transaction as SqlTransaction);
-        foreach (var columnMapping in mapping)
+        var objectReader = context.Items.ToObjectDapperReader(_dialect, context.ColumnsToProperty.Select(x => x.Value.Name).ToArray());
+        using var microsoftClientBukCopy = new SqlBulkCopy(context.Connection as SqlConnection, SqlBulkCopyOptions.Default, context.Transaction as SqlTransaction);
+        foreach (var columnMapping in context.ColumnsToProperty)
         {
             microsoftClientBukCopy.ColumnMappings.Add(new SqlBulkCopyColumnMapping(columnMapping.Value.Name, columnMapping.Key));
         }
         microsoftClientBukCopy.EnableStreaming = true;
-        microsoftClientBukCopy.BatchSize = batchSize;
-        microsoftClientBukCopy.BulkCopyTimeout = timeout;
-        microsoftClientBukCopy.DestinationTableName = tableName;
+        microsoftClientBukCopy.BatchSize = context.BatchSize;
+        microsoftClientBukCopy.BulkCopyTimeout = context.Timeout;
+        microsoftClientBukCopy.DestinationTableName = destination;
 
         await microsoftClientBukCopy.WriteToServerAsync(objectReader);
     }

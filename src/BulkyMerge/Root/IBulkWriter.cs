@@ -1,12 +1,8 @@
-using System.Collections.Generic;
-using System.Data.Common;
 using System.Threading.Tasks;
-using FastMember;
-
 namespace BulkyMerge.Root;
 
-public interface IBulkWriter
+internal interface IBulkWriter
 {
-    void Write<T>(DbConnection connection, DbTransaction transaction, int timeout, int batchSize, IEnumerable<T> items, IEnumerable<KeyValuePair<string, Member>> mapping, string tableName);
-    Task WriteAsync<T>(DbConnection connection, DbTransaction transaction, int timeout, int batchSize, IEnumerable<T> items, IEnumerable<KeyValuePair<string, Member>> mapping, string tableName);
+    void Write<T>(string destination, MergeContext<T> context);
+    Task WriteAsync<T>(string destination, MergeContext<T> context);
 }

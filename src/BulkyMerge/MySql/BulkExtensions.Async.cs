@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BulkyMerge.Root;
 using MySqlConnector;
@@ -17,7 +18,7 @@ public static partial class MySqlBulkExtensions
     => BulkExtensions.BulkCopyAsync(BulkWriter, connection, transaction, items, tableName, excludeColumns, timeout, batchSize);
 
     public static Task BulkInsertOrUpdateAsync<T>(this MySqlConnection connection,
-        IList<T> items,
+        IEnumerable<T> items,
         string tableName = default,
         MySqlTransaction transaction = default,
         int batchSize = BulkExtensions.DefaultBatchSize,
@@ -36,7 +37,7 @@ public static partial class MySqlBulkExtensions
             timeout);
      
      public static Task BulkInsertAsync<T>(this MySqlConnection connection,
-         IList<T> items,
+         IEnumerable<T> items,
          string tableName = default,
          MySqlTransaction transaction = default,
          int batchSize =  BulkExtensions.DefaultBatchSize,
@@ -65,7 +66,7 @@ public static partial class MySqlBulkExtensions
      => BulkExtensions.BulkUpdateAsync(BulkWriter, 
          Dialect, 
          connection, 
-         items, 
+         items.ToList(), 
          tableName, 
          transaction,
          batchSize, 
@@ -84,7 +85,7 @@ public static partial class MySqlBulkExtensions
          => BulkExtensions.BulkDeleteAsync(BulkWriter, 
              Dialect, 
              connection, 
-             items, 
+             items.ToList(), 
              tableName, 
              transaction,
              batchSize, 
