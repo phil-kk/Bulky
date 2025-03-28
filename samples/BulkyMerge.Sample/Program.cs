@@ -27,7 +27,7 @@ foreach (var person in people)
 }
 
 
-SqlMapper.AddTypeHandler(typeof(JsonObj), new DappetTypeHandler());
+SqlMapper.AddTypeHandler(typeof(JsonObj), new DapperTypeHandler());
 await using var fetchConnection = new SqlConnection(connectionString);
 var result = await fetchConnection.QueryAsync<Person>("SELECT * FROM [Person]");
 
@@ -51,7 +51,7 @@ public class JsonObj
     public string JsonProp { get; set; }
 }
 
-class DappetTypeHandler : ITypeHandler
+class DapperTypeHandler : ITypeHandler
 {
     public object Parse(Type destinationType, object value)
     {
