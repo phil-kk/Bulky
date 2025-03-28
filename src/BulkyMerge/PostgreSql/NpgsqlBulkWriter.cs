@@ -61,6 +61,13 @@ internal sealed class NpgsqlBulkWriter : IBulkWriter
                     return value;
                 }
             }
+            var valueType = value.GetType();
+            var underlyingType = Nullable.GetUnderlyingType(valueType) ?? valueType;
+
+            if (underlyingType?.IsEnum == true)
+            {
+                return Convert.ToInt32(value);
+            }
         }
         return value;
     }

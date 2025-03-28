@@ -37,7 +37,7 @@ public class AllFieldTypesWithIdentityTests
 {
     public long Id { get; set; }
     public string NvarcharValue { get; set; }
-    public EnumValue EnumValue { get; set; }
+    public EnumValue? EnumValue { get; set; }
     public string BigTextValue { get; set; }
     public int IntValue { get; set; }
     public decimal DecimalValue { get; set; }
@@ -147,10 +147,10 @@ public class PgSqlTestsBase
 
     protected void CreateAllFieldsTable(string name)
     {
-        TypeConverters.RegisterTypeConverter(typeof(EnumValue), (e) =>
+       /* TypeConverters.RegisterTypeConverter(typeof(EnumValue), (e) =>
         {
             return Convert.ToInt32(e);
-        });
+        });*/
         using var connection = new NpgsqlConnection(ConnectionString);
         {
             connection.Open();
@@ -238,6 +238,7 @@ public class PgSqlTestsBase
 	    Assert.True(select.Select(x => x.Id).SequenceEqual(items.Select(x => x.Id)));
 	    Assert.True(select.OrderBy(x => x.IntValue).Select(x => x.IntValue).SequenceEqual(Enumerable.Range(0, count)));
 	    Assert.True(select.OrderBy(x => x.DecimalValue).Select(x => x.DecimalValue).SequenceEqual(Enumerable.Range(0, count).Select(x => (decimal)x)));
+        Assert.True(select.All(x => x.EnumValue == EnumValue.Third));
     }
     
     private string GetDropTableQuery(string name) =>

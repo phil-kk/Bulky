@@ -18,25 +18,29 @@ public class UpdateTests : PgSqlTestsBase
             var id1 = InsertAllFields(tableName,new  AllFieldTypesWithIdentityTests
             {
                 DecimalValue = -1,
-                IntValue = -1
+                IntValue = -1,
+                EnumValue = EnumValue.First
             });
             var id2 = InsertAllFields(tableName, new AllFieldTypesWithIdentityTests
             {
                 DecimalValue = -2,
-                IntValue = -2
+                IntValue = -2,
+                EnumValue = EnumValue.Second
             });
             var items = new List<AllFieldTypesWithIdentityTests>();
             items.Add(new AllFieldTypesWithIdentityTests
             {
                 Id = id1,
                 DecimalValue = 0,
-                IntValue = 0
+                IntValue = 0,
+                EnumValue = EnumValue.Third
             });
             items.Add(new AllFieldTypesWithIdentityTests
             {
                 Id = id2, 
                 DecimalValue = 1,
-                IntValue = 1
+                IntValue = 1,
+                EnumValue = EnumValue.Third
             });
             await using var connection = new NpgsqlConnection(ConnectionString);
             await connection.OpenAsync();

@@ -84,7 +84,10 @@ namespace BulkyMerge.PostgreSql.Tests
                     items.Add(new AllFieldTypesWithIdentityTests
                     {
                         DecimalValue = i,
-                        IntValue = i
+                        IntValue = i,
+                        BigTextValue = $"Text {i}",
+                        EnumValue = EnumValue.Third,
+                        GuidValue = Guid.NewGuid()
                     });
                 }
                 await using var connection = new NpgsqlConnection(ConnectionString);
