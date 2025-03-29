@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F488549D-8767-4910-940F-FC8C450F1074}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6A9EE9CF-8C13-4C47-8C3C-04331B49AA16}"
+	ProjectSection(SolutionItems) = preProject
+		tests\dockers.txt = tests\dockers.txt
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BulkyMerge.SqlServer.Tests", "tests\SqlServer.Tests\BulkyMerge.SqlServer.Tests.csproj", "{42261F6A-E164-4B39-8EF1-2BBFB06CB5CB}"
 EndProject
