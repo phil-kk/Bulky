@@ -109,7 +109,7 @@ internal static partial class BulkExtensions
 
         await using (var reader = await ExecuteReaderAsync(connection, merge, transaction))
         {
-            MapIdentity(reader, context);
+            await MapIdentityAsync(reader, context);
         }
         if (shouldCloseConnection) await connection.CloseAsync();
     }
@@ -215,5 +215,25 @@ internal static partial class BulkExtensions
         command.CommandText = sql;
         command.Transaction = transaction;
         return await command.ExecuteReaderAsync();
+    }
+
+    private static async Task MapIdentityAsync<T>(DbDataReader reader, MergeContext<T> context)
+    {
+        if (context.Identity is null) return;
+        var identityTypeCacheItem = context.ColumnsToProperty.Where(x =>
+            x.Key.Equals(context.Identity.ColumnName, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Value).First();
+        var identityType = identityTypeCacheItem.Type;
+        var defaultIdentityValue = !identityType.IsGenericType ? Activator.CreateInstance(identityType) : null;
+        var identityName = identityTypeCacheItem.Name;
+        foreach (var item in context.Items)
+        {
+            var value = context.TypeAccessor[item, identityName];
+            if (!object.Equals(defaultIdentityValue, value))
+                continue;
+            if (await reader.ReadAsync())
+            {
+                context.TypeAccessor[item, identityName] = Convert(reader[0]);
+            }
+        }
     }
 }

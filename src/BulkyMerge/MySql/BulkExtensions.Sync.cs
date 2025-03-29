@@ -13,7 +13,7 @@ public static partial class MySqlBulkExtensions
         IEnumerable<string> excludeColumns = default,
         int timeout = int.MaxValue,
         int batchSize = BulkExtensions.DefaultBatchSize)
-    => BulkExtensions.BulkCopy(BulkWriter, connection, transaction, items, tableName, timeout, excludeColumns, batchSize);
+    => BulkExtensions.BulkCopy(BulkWriter, connection, transaction, items, tableName, excludeColumns, timeout, batchSize);
 
      public static  void BulkInsertOrUpdate<T>(this MySqlConnection connection,
             IEnumerable<T> items,

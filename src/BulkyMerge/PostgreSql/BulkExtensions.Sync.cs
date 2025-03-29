@@ -1,11 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
 using BulkyMerge.Root;
-using Dapper;
-using FastMember;
 using Npgsql;
 
 namespace BulkyMerge.PostgreSql;
@@ -19,7 +13,7 @@ public static partial class NpgsqlBulkExtensions
         IEnumerable<string> excludeColumns = default,
         int timeout = int.MaxValue,
         int batchSize = BulkExtensions.DefaultBatchSize)
-    => BulkExtensions.BulkCopy(BulkWriter, connection, transaction, items, tableName, timeout, excludeColumns, batchSize);
+    => BulkExtensions.BulkCopy(BulkWriter, connection, transaction, items, tableName, excludeColumns, timeout, batchSize);
 
      public static  void BulkInsertOrUpdate<T>(this NpgsqlConnection connection,
             IEnumerable<T> items,

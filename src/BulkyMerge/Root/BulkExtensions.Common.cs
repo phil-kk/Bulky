@@ -1,6 +1,8 @@
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace BulkyMerge.Root;
 
@@ -23,24 +25,5 @@ internal static partial class BulkExtensions
         if (val is ulong ul)
             return ul;
         return val;
-    }
-    private static void MapIdentity<T>(IDataReader reader, MergeContext<T> context)
-    {
-        if (context.Identity is null) return;
-        var identityTypeCacheItem = context.ColumnsToProperty.Where(x =>
-            x.Key.Equals(context.Identity.ColumnName, StringComparison.InvariantCultureIgnoreCase)).Select(x => x.Value).First();
-        var identityType = identityTypeCacheItem.Type;
-        var defaultIdentityValue = !identityType.IsGenericType ? Activator.CreateInstance(identityType) : null;
-        var identityName = identityTypeCacheItem.Name;
-        foreach (var item in context.Items)
-        {
-            var value = context.TypeAccessor[item, identityName];
-            if (!object.Equals(defaultIdentityValue, value)) 
-                continue;
-            if (reader.Read())
-            {
-                context.TypeAccessor[item, identityName] = Convert(reader[0]);
-            }
-        }
     }
 }

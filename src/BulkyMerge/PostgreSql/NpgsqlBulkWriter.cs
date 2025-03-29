@@ -16,7 +16,7 @@ internal sealed class NpgsqlBulkWriter : IBulkWriter
 {
     private static readonly ConcurrentDictionary<Type, object> enumCache = new();
 
-    private Dictionary<string, string> GetColumns(DbConnection connection, string tableName)
+    private async Task<Dictionary<string, string>> GetColumns(DbConnection connection, string tableName)
     {
         var columns = new Dictionary<string, string>();
         try
@@ -25,16 +25,14 @@ internal sealed class NpgsqlBulkWriter : IBulkWriter
                         FROM information_schema.columns 
                         WHERE table_name = @tableName";
 
-            using (var cmd = new NpgsqlCommand(query, connection as NpgsqlConnection))
-            {
-                cmd.Parameters.AddWithValue("tableName", tableName);
+            using var cmd = new NpgsqlCommand(query, connection as NpgsqlConnection);
+            cmd.Parameters.AddWithValue("tableName", tableName);
 
-                using (var reader = cmd.ExecuteReader())
+            using (var reader = await cmd.ExecuteReaderAsync())
+            {
+                while (await reader.ReadAsync())
                 {
-                    while (reader.Read())
-                    {
-                        columns[reader.GetString(0).ToLower()]= reader.GetString(1);
-                    }
+                    columns[reader.GetString(0).ToLower()] = reader.GetString(1);
                 }
             }
         }
@@ -74,47 +72,11 @@ internal sealed class NpgsqlBulkWriter : IBulkWriter
 
 
     public void Write<T>(string destination, MergeContext<T> context)
-    {
-        var columnTypes = GetColumns(context.Connection, context.TableName);
-        var columnsMapping = new List<KeyValuePair<string, Member>>(context.ColumnsToProperty);
-        var columns = columnsMapping.Select(x => x.Key);
-        var columnsString = string.Join(",", columns.Select(x => $"\"{x}\""));
-        var accessor = TypeAccessor.Create(typeof(T));
-        using var writer = (context.Connection as NpgsqlConnection)?.BeginBinaryImport($"COPY \"{destination}\" ({columnsString}) FROM STDIN (FORMAT BINARY)");
-        writer.Timeout = TimeSpan.FromDays(1);
-        var row = new object[columnsMapping.Count];
-        foreach (var item in context.Items)
-        {
-            writer.StartRow();
-            foreach (var columnMapping in columnsMapping)
-            {
-                var commonConverter = TypeConverters.GetConverter(columnMapping.Value.Type);
-                var value = accessor[item, columnMapping.Value.Name];
-                var type = columnTypes.TryGetValue(columnMapping.Key.ToLower(), out var columnType) ? columnType : null;
-                if (commonConverter != null)
-                {
-                    value = commonConverter.Convert(value);
-                }
-                if (type != null)
-                {
-                    if (value is null)
-                    {
-                        writer.WriteNull();
-                    }
-                    else
-                    {
-                        writer.Write(PrepareValue(value, type), type);
-                    }
-                }
-            }
-        }
-
-        writer.Complete();
-    }
+        => WriteAsync(destination, context).GetAwaiter().GetResult();
 
     public async Task WriteAsync<T>(string destination, MergeContext<T> context)
     {
-        var columnTypes = GetColumns(context.Connection, context.TableName);
+        var columnTypes = await GetColumns(context.Connection, context.TableName);
         var columnsMapping = new List<KeyValuePair<string, Member>>(context.ColumnsToProperty);
         var columns = columnsMapping.Select(x => x.Key);
         var columnsString = string.Join(",", columns.Select(x => $"\"{x}\""));
